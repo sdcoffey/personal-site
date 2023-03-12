@@ -1,0 +1,7 @@
+let g:ale_fixers = {
+\  'astro': ['prettier'],
+\  'javascript': ['prettier'],
+\  'typescript': ['prettier'],
+\  'typescriptreact': ['prettier'],
+\  'css': ['prettier']
+\ }
