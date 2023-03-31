@@ -1,0 +1,5 @@
+.astro/*
+dist/*
+.idea/*
+.netlify/*
+.vscode/*

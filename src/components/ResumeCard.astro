@@ -1,0 +1,18 @@
+---
+type Props = {
+  title: string;
+  name: string;
+  class?: string;
+  dates: string;
+};
+
+const { name, class: className, dates, title } = Astro.props;
+---
+
+<div class:list={["rounded-xl shadow-lg p-8 w-full flex flex-col relative", className]}>
+  <h2 class="text-emerald-900">{name}</h2>
+  <h3 class="text-emerald-900">{title}</h3>
+  <p class="text-light text-xs text-emerald-800">{dates}</p>
+  <p class="text-emerald-800">Sonder is a leading something something</p>
+</div>
+<style></style>

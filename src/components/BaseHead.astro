@@ -25,6 +25,8 @@ const { title, description, image = "/placeholder-social.jpg" } = Astro.props;
 <!-- RSS Feed Discovery -->
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
 
+<link rel="sitemap" href="/sitemap-index.xml" />
+
 <!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="title" content={title} />

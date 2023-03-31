@@ -1,7 +1,10 @@
 ---
-import BaseHead from "../components/BaseHead.astro";
-import HeaderLink from "../components/HeaderLink.astro";
+import { BaseHead, HeaderLink } from "../components";
+
+import { Image } from "astro:assets";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+
+import steve from "../assets/steve.jpg";
 
 interface Props {
   showNav?: boolean;
@@ -16,25 +19,33 @@ const { docTitle, docDescription, title, showNav } = Astro.props;
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <BaseHead
-      title={docTitle ?? SITE_TITLE}
-      description={docDescription ?? SITE_DESCRIPTION}
-    />
+    <BaseHead title={docTitle ?? SITE_TITLE} description={docDescription ?? SITE_DESCRIPTION} />
   </head>
-  <body class="min-h-screen w-screen py-32 bg-white">
-    <div class="px-8 lg:px-0 lg:max-w-prose mx-auto">
+  <body class="min-h-screen w-screen bg-slate-50 py-32">
+    <div class="mx-auto px-8 lg:max-w-prose lg:px-0">
       <div class="flex flex-col gap-4">
+        <a href="/">
+          <Image
+            src={steve}
+            alt="Photo of Steve"
+            format="webp"
+            quality="med"
+            height={160}
+            wdith={160}
+            class="h-20 w-20 rounded-full"
+          />
+        </a>
         <h1>{title}</h1>
         {
           showNav && (
-            <nav class="w-full flex flex-row gap-2">
+            <nav class="flex w-full flex-row gap-2">
               <HeaderLink href="/">About</HeaderLink>
               <HeaderLink href="/blog">Blog</HeaderLink>
             </nav>
           )
         }
       </div>
-      <hr class="border-slate-200 my-12" />
+      <hr class="my-12 border-slate-200" />
       <main><slot /></main>
     </div>
   </body>

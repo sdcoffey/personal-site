@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
-import FormattedDate from "../components/FormattedDate.astro";
+import { FormattedDate } from "../components";
 
 import MainLayout from "../layouts/MainLayout.astro";
 
@@ -9,18 +9,11 @@ type Props = CollectionEntry<"blog">["data"];
 const { title, description, pubDate } = Astro.props;
 ---
 
-<MainLayout title={title} docTitle={title} docDescription={description}>
-  <article
-    class="prose prose-pre:p-1 prose-pre:bg-slate-200 prose-pre:rounded-sm"
-  >
+<MainLayout title={title} docTitle={title} docDescription={description} showNav={true}>
+  <article class="article prose prose-pre:rounded-sm prose-pre:bg-slate-200 prose-pre:p-1">
     <FormattedDate date={pubDate} />
     <div class="py-12">
       <slot />
     </div>
   </article>
 </MainLayout>
-<style>
-  .astro-code {
-    background-color: #abcdef;
-  }
-</style>

@@ -6,15 +6,12 @@ type Props = HTMLAttributes<"a">;
 const { href, class: className, ...props } = Astro.props;
 
 const { pathname } = Astro.url;
-const isActive = href === pathname || href === pathname.replace(/\/$/, "");
+const isActive = href === pathname || (href !== "/" && pathname.replace(/\/$/, "").startsWith(href));
 ---
 
 <a
   href={href}
-  class:list={[
-    "no-underline text-slate-600 font-regular",
-    { "font-bold text-slate-9000": isActive },
-  ]}
+  class:list={["no-underline text-slate-600 font-regular", { "font-bold text-slate-9000": isActive }]}
   {...props}
 >
   <slot />

@@ -1,11 +1,11 @@
 ---
 import { getCollection } from "astro:content";
-import FormattedDate from "../../components/FormattedDate.astro";
+import { FormattedDate, If } from "../../components";
 
 import MainLayout from "../../layouts/MainLayout.astro";
 
 const posts = (await getCollection("blog"))
-  .filter((p) => !p.data.draft ?? false)
+  .filter((p) => (!p.data.draft ?? false) || import.meta.env.MODE === "development")
   .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf())
   .reverse();
 ---
@@ -15,13 +15,15 @@ const posts = (await getCollection("blog"))
     {
       posts.map((post) => (
         <li class="flex flex-col gap-px">
-          <a class="text-lg font-bold" href={`/blog/${post.slug}/`}>
-            {post.data.title}
-          </a>
-          <FormattedDate
-            class="text-sm text-slate-600"
-            date={post.data.pubDate}
-          />
+          <div class="flex flex-row items-center gap-3">
+            <a class="text-lg font-bold" href={`/blog/${post.slug}/`}>
+              {post.data.title}
+            </a>
+            <If cond={post.data.draft}>
+              <span class="text-xs font-bold uppercase text-amber-600">draft</span>
+            </If>
+          </div>
+          <FormattedDate class="text-sm text-slate-600" date={post.data.pubDate} />
         </li>
       ))
     }

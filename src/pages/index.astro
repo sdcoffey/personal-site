@@ -1,7 +1,29 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
+
+import { ResumeCard } from "../components";
 ---
 
 <MainLayout showNav={true} title="Steve Coffey">
-  <h1>Hi it's me steve</h1>
+  <article class="prose prose-slate">
+    <h1 class="font-semibold">👋 I'm Steve</h1>
+    <p>I'm a full-stack engineer, founder, and occasional amateur chef.</p>
+
+    <h2 class="">Currently</h2>
+    <div class="relative flex flex-col gap-y-12 py-8">
+      <ResumeCard
+        title="Co-founder"
+        name="Trava"
+        class="relative z-10 bg-emerald-400 prose-headings:m-0 prose-p:my-2"
+        dates="Jun 2018 - Aug 2021"
+      />
+
+      <ResumeCard
+        title="Staff Software Engineer"
+        name="Sonder"
+        class="relative z-10 bg-emerald-400 prose-headings:m-0 prose-p:my-2"
+        dates="Jun 2018 - Aug 2021"
+      />
+    </div>
+  </article>
 </MainLayout>

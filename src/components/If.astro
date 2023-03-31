@@ -1,0 +1,9 @@
+---
+type Props = {
+  cond: boolean;
+};
+
+const { cond } = Astro.props;
+---
+
+{cond && <slot />}

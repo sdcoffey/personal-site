@@ -6,4 +6,10 @@
   h1 {
     @apply text-3xl;
   }
+
+  .article {
+    .astro-code {
+      @apply m-0 rounded-none bg-transparent p-0 !important;
+    }
+  }
 }
