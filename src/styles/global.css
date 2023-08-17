@@ -7,6 +7,10 @@
     @apply text-3xl;
   }
 
+  h1.page-title {
+    @apply text-5xl lg:text-8xl font-bold;
+  }
+
   .article {
     .astro-code {
       @apply m-0 rounded-none bg-transparent p-0 !important;

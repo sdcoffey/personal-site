@@ -10,22 +10,28 @@ const posts = (await getCollection("blog"))
   .reverse();
 ---
 
-<MainLayout title="Blog" showNav={true}>
-  <ul class="flex flex-col gap-3">
-    {
-      posts.map((post) => (
-        <li class="flex flex-col gap-px">
-          <div class="flex flex-row items-center gap-3">
-            <a class="text-lg font-bold" href={`/blog/${post.slug}/`}>
-              {post.data.title}
-            </a>
-            <If cond={post.data.draft}>
-              <span class="text-xs font-bold uppercase text-amber-600">draft</span>
-            </If>
-          </div>
-          <FormattedDate class="text-sm text-slate-600" date={post.data.pubDate} />
-        </li>
-      ))
-    }
-  </ul>
+<MainLayout title="The Blog" showNav={true}>
+  <div class="flex flex-col gap-12">
+    <h1 class="page-title">The Blog</h1>
+    <ul class="flex flex-col gap-10">
+      {
+        posts.map((post) => (
+            <li class="flex flex-col gap-px">
+              <a class="hover:cursor-pointer" href={`/blog/${post.slug}/`}>
+                <p class="text-lg font-semibold">{post.data.title}</p>
+                <p class="text-sm font-light line-clamp-2">
+                  {post.data.description}
+                </p>
+                <div class="flex items-center gap-3">
+                  <FormattedDate class="text-sm text-slate-600" date={post.data.pubDate} />
+                  <If cond={post.data.draft}>
+                    <p class="text-xs font-bold uppercase text-amber-600">draft</p>
+                  </If>
+                </div>
+              </a>
+            </li>
+        ))
+      }
+    </ul>
+  </div>
 </MainLayout>

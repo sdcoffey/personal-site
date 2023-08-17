@@ -12,158 +12,43 @@ import twittermark from '../assets/twitter.svg'
 const githubUrl = 'https://github.com/sdcoffey';
 const linkedinUrl = 'https://linkedin.com/in/stevendcoffey';
 const twitterUrl = 'https://twitter.com/stevendcoffey';
+
+const externalLinks = [
+  {url: githubUrl, label: "Github", icon: githubmark, alt: "My Github" },
+  {url: linkedinUrl, label: "Linkedin", icon: linkedinmark, alt: "My Linkedin" },
+  {url: twitterUrl, label: "Twitter", icon: twittermark, alt: "My Twitter" },
+]
 ---
 
-<nav class="navigation flex absolute lg:fixed right-0 top-0 left-0 justify-start flex-col p-4 lg:p-8 gap-8">
-  <button class="navigation__mobile-nav-toggle lg:hidden">
+<nav class="navigation z-10 flex w-full bg-slate-50 lg:w-fit fixed right-0 top-0 left-0 justify-between lg:justify-start lg:flex-col p-4 lg:p-8 gap-8">
+  <button class="navigation__mobile-nav-toggle hidden">
     <Bars3 class="w-6 h-6 text-slate-600 hover:text-black" />
   </button>
 
-  <div class="hidden lg:flex flex-col gap-1">
-    <h2 class="font-bold text-sm text-slate-600">Content</h2>
+  <div class="flex items-center lg:items-start lg:flex-col gap-1">
+    <h2 class="hidden lg:block font-bold text-sm text-slate-600">Stuff here</h2>
     <HeaderLink href="/">Home</HeaderLink>
     <HeaderLink href="/blog">Blog</HeaderLink>
     <HeaderLink href="/resume">Resume</HeaderLink>
   </div>
 
-  <div class="hidden lg:flex flex-col gap-1">
-    <h2 class="font-bold text-sm text-slate-600">Other Stuff</h2>
-    <HeaderLink href={githubUrl}>Github</HeaderLink>
-    <HeaderLink href={linkedinUrl}>LinkedIn</HeaderLink>
-    <HeaderLink href={twitterUrl}>Twitter</HeaderLink>
+  <div class="hidden lg:flex lg:flex-col gap-1">
+    <h2 class="font-bold text-sm text-slate-600">Stuff elsewhere</h2>
+    {externalLinks.map(link => (
+        <HeaderLink href={link.url} external={true}>{link.label}</HeaderLink>
+    ))}
+  </div>
+
+  <div class="flex lg:hidden flex-row py-1 px-2 justify-start gap-3 md:gap-5">
+    {externalLinks.map(link => (
+        <a href={link.url} target="_blank" rel="noreferrer">
+          <Image
+              width={24}
+              height={24}
+              src={link.icon}
+              class="h-4 w-4 md:h-6 md:w-6"
+              alt={link.alt} />
+        </a>
+    ))}
   </div>
 </nav>
-
-<dialog class="mobile-navigation">
-  <nav class="mobile-navigation__menu mobile-navigation__menu--open flex flex-col justify-center gap-4 p-4">
-    <button class="mobile-navigation__dialog-close-button focus:outline-none">
-      <X class="w-6 h-6" />
-    </button>
-    <HeaderLink href="/">Home</HeaderLink>
-    <HeaderLink href="/blog">Blog</HeaderLink>
-    <HeaderLink href="/resume">Resume</HeaderLink>
-
-    <div class="flex flex-row pt-2 px-2 w-full justify-start gap-4">
-      <a href={githubUrl} target="_blank" rel="noreferrer">
-        <Image
-          width={24}
-          height={24}
-          src={githubmark}
-          alt="github logo" />
-      </a>
-      <a href={linkedinUrl} target="_blank" rel="noreferrer">
-        <Image
-            width={24}
-            height={24}
-            src={linkedinmark}
-            alt="linkedin logo" />
-      </a>
-      <a href={twitterUrl} target="_blank" rel="noreferrer">
-        <Image
-            width={24}
-            height={24}
-            src={twittermark}
-            alt="linkedin logo" />
-      </a>
-    </div>
-  </nav>
-</dialog>
-
-<script>
-  function dialog(): HTMLDialogElement {
-    return document.querySelector('.mobile-navigation') as HTMLDialogElement;
-  }
-
-  function isOpen(): boolean {
-    return dialog().open;
-  }
-
-  function toggleMobileDialog(): void {
-    if (isOpen()) {
-      dialog().classList.toggle('mobile-navigation--close', true);
-    } else {
-      dialog().showModal();
-      dialog().classList.toggle('mobile-navigation--open', true);
-    }
-  }
-
-  document.querySelector('.navigation__mobile-nav-toggle').addEventListener('click', toggleMobileDialog);
-  document.querySelector('.mobile-navigation__dialog-close-button').addEventListener('click', toggleMobileDialog);
-  document.addEventListener("DOMContentLoaded", () => {
-    dialog().addEventListener('animationend', () => {
-      if (dialog().classList.contains('mobile-navigation--close')) {
-        dialog().classList.toggle('mobile-navigation--close', false);
-        dialog().close()
-      }
-    })
-  })
-  dialog().addEventListener('click', (event) => {
-    const { y: dialogY, height: dialogHeight } = dialog().querySelector('.mobile-navigation__menu').getBoundingClientRect();
-    if (isOpen() && event.clientY > dialogY + dialogHeight) {
-      toggleMobileDialog();
-    }
-  });
-</script>
-
-<style>
-  @keyframes slide-in-top {
-    0% {
-      transform: translateY(-100%);
-    }
-    100% {
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slide-out-top {
-    0% {
-      transform: translateY(0);
-    }
-    100% {
-      transform: translateY(-100%);
-    }
-  }
-
-  @keyframes fade-in {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes fade-out {
-    0% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-    }
-  }
-
-  .mobile-navigation {
-    @apply z-10 m-0 w-full max-w-[100vw] bg-transparent;
-    @apply backdrop:bg-black/50 backdrop:backdrop-blur;
-  }
-
-  .mobile-navigation--open::backdrop {
-    animation: fade-in 150ms ease-in-out;
-  }
-
-  .mobile-navigation--close::backdrop {
-    animation: fade-out 150ms ease-in-out;
-  }
-
-  .mobile-navigation--open .mobile-navigation__menu {
-    animation: slide-in-top 150ms ease-in-out;
-  }
-
-  .mobile-navigation--close .mobile-navigation__menu {
-    animation: slide-out-top 150ms ease-in-out;
-  }
-
-  .mobile-navigation__menu {
-    @apply w-full bg-slate-50 rounded-b-lg shadow-lg;
-  }
-</style>

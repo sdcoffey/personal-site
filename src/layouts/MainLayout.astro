@@ -21,13 +21,13 @@ const { docTitle, docDescription, title, showNav } = Astro.props;
   <head>
     <BaseHead title={docTitle ?? SITE_TITLE} description={docDescription ?? SITE_DESCRIPTION} />
   </head>
-  <body class="min-h-screeo w-screen bg-slate-50 py-32">
+  <body class="min-h-available w-screen bg-slate-50 py-20 lg:py-32">
   {
       showNav && (
           <Nav />
       )
   }
-    <div class="mx-auto px-8 lg:max-w-prose lg:px-0">
+    <div class="mx-auto px-6 lg:max-w-prose lg:px-0">
       <main><slot /></main>
     </div>
   </body>

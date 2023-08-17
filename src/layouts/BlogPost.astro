@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import type { CollectionEntry } from "astro:content";
 import { FormattedDate } from "../components";
 
@@ -6,13 +7,29 @@ import MainLayout from "../layouts/MainLayout.astro";
 
 type Props = CollectionEntry<"blog">["data"];
 
-const { title, description, pubDate } = Astro.props;
+const { title, description, pubDate, heroImage } = Astro.props;
 ---
 
 <MainLayout title={title} docTitle={title} docDescription={description} showNav={true}>
-  <article class="article prose prose-pre:rounded-sm prose-pre:bg-slate-200 prose-pre:p-1">
-    <FormattedDate date={pubDate} />
-    <div class="py-12">
+  <article class="article mx-auto prose prose-pre:rounded-sm prose-pre:bg-slate-200 prose-pre:p-1">
+    <h1 class="page-title mb-2">{title}</h1>
+    <h4>{description}</h4>
+    <FormattedDate date={pubDate} class="text-sm" />
+    {heroImage && (
+        <div class="relative lg:contents">
+          <Image
+            class="max-h-[300px] my-12 lg:my-24 md:max-h-[400px] lg:max-h-[500px] rounded-lg shadow-sm object-cover"
+            src={heroImage}
+            alt={description}
+            width={1200}
+            height={1200}
+            format="webp" />
+        </div>
+    )}
+    {!heroImage && (
+        <hr>
+    )}
+    <div class="article-content">
       <slot />
     </div>
   </article>
