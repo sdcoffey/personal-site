@@ -17,7 +17,6 @@ const twitterUrl = 'https://twitter.com/stevendcoffey';
 <nav class="navigation flex absolute lg:fixed right-0 top-0 left-0 justify-start flex-col p-4 lg:p-8 gap-8">
   <button class="navigation__mobile-nav-toggle lg:hidden">
     <Bars3 class="w-6 h-6 text-slate-600 hover:text-black" />
-
   </button>
 
   <div class="hidden lg:flex flex-col gap-1">
@@ -98,6 +97,12 @@ const twitterUrl = 'https://twitter.com/stevendcoffey';
       }
     })
   })
+  dialog().addEventListener('click', (event) => {
+    const { y: dialogY, height: dialogHeight } = dialog().querySelector('.mobile-navigation__menu').getBoundingClientRect();
+    if (isOpen() && event.clientY > dialogY + dialogHeight) {
+      toggleMobileDialog();
+    }
+  });
 </script>
 
 <style>
