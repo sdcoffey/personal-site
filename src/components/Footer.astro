@@ -3,11 +3,17 @@ const today = new Date();
 ---
 
 <footer>
-  &copy; {today.getFullYear()} Steve Coffey.
+  <p>
+    &copy; {today.getFullYear()} Steve Coffey.
+  </p>
 </footer>
+
 <style>
   footer {
-    padding: 25px;
-    text-align: center;
+    @apply mx-auto flex w-full p-6 lg:max-w-prose lg:px-0;
+
+    p {
+      @apply font-mono text-sm text-slate-400;
+    }
   }
 </style>

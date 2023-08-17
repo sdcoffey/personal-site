@@ -11,9 +11,27 @@
     @apply text-5xl lg:text-8xl font-bold;
   }
 
+  .min-h-available {
+    min-height: stretch;
+  }
+
+  .h-available {
+    height: stretch;
+  }
+
   .article {
     .astro-code {
       @apply m-0 rounded-none bg-transparent p-0 !important;
+    }
+  }
+
+  .padded-container {
+    & > * {
+      @apply px-6 lg:px-0;
+
+      &:where(.no-padding) {
+        @apply px-0;
+      }
     }
   }
 }

@@ -1,16 +1,134 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
+import { getCollection } from "astro:content";
 
-import { ResumeCard } from "../components";
+import { BlogCard } from "../components";
+
+const posts = (await getCollection("blog"))
+  .filter((p) => (!p.data.draft ?? false) || import.meta.env.MODE === "development")
+  .sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf())
+  .reverse()
+  .slice(0, 3);
+
+type Foss = { name: string; type: "Author" | "Contributor"; description: string; language: string; url: string };
+const foss: Foss[] = [
+  {
+    name: "Techan",
+    type: "Author",
+    description:
+      "Techan is blazing-fast technical analysis toolkit for Go. Use it for analyzing time-series price streams or building complex trading rules.",
+    url: "https://github.com/scoffey/techan",
+    language: "Go",
+  },
+  {
+    name: "Avo",
+    type: "Contributor",
+    description:
+      "Avo is a drop-in admin dashboard for Rails that helps developers build productive web apps 10x faster.",
+    url: "https://avohq.io/",
+    language: "RB",
+  },
+  {
+    name: "Buzz.js",
+    type: "Author",
+    description:
+      "Buzz.js is a simple tool to help you mock GraphQL responses in your components that use Apollo's useQuery and useMutation hooks.",
+    url: "https://github.com/Flatbook/buzz.js",
+    language: "TS",
+  },
+];
 ---
 
 <MainLayout showNav={true} title="Steve Coffey">
-  <article class="prose prose-slate">
+  <article class="padded-container prose prose-slate">
     <h1 class="page-title">👋 I'm Steve</h1>
-    <p>I'm an engineer, entrepreneur, and occasionally, an amateur chef. I work up and down the stack but have a special love for creating beautiful, functional user interfaces for the web.</p>
+    <p>
+      I'm an engineer, entrepreneur, and occasionally, an amateur chef. I work up and down the stack but have a special
+      love for creating beautiful, functional user interfaces for the web.
+    </p>
+
+    <p>I write about software, startups, finance, and interesting adjacent topics.</p>
+
+    <p>Want to get in touch? Drop me a line at <a href="mailto:stevendcoffey@gmail.com">stevendcoffey@gmail.com</a></p>
 
     <h2>Work</h2>
     <h2>From the blog</h2>
+    <div
+      class="grid-rows-auto scrollbar-hidden flex max-w-full snap-x snap-mandatory scroll-px-6 grid-cols-2 gap-4 overflow-x-scroll py-2 md:grid md:snap-none"
+    >
+      {
+        posts.map(({ slug, data }) => (
+          <BlogCard
+            slug={slug}
+            title={data.title}
+            heroImage={data.heroImage}
+            description={data.description}
+            pubDate={data.pubDate}
+            class="md:max-w-1/2 min-w-full snap-start md:max-w-none"
+          />
+        ))
+      }
+    </div>
     <h2>Open source</h2>
+    <p>I love FOSS. I've built and contributed to several open-source projects:</p>
+
+    <div class="open-source not-prose">
+      <ul>
+        {
+          foss.map(({ name, description, url, type, language }) => (
+            <li>
+              <a href={url} target="_blank" rel="noreferrer" class="no-underline">
+                <div class="flex items-center gap-4">
+                  <div class="flex grow flex-col">
+                    <div class="flex items-center gap-2">
+                      <h2>{name}</h2>
+                      <p
+                        class:list={[
+                          "rounded px-1 !text-xs",
+                          { "bg-emerald-400": type === "Author", "bg-amber-400": type === "Contributor" },
+                        ]}
+                      >
+                        {type}
+                      </p>
+                    </div>
+                    <p>{description}</p>
+                  </div>
+                  <span class="flex-shrink px-3 font-mono uppercase text-slate-400">{language}</span>
+                </div>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </article>
 </MainLayout>
+
+<style>
+  .open-source {
+    ul {
+      @apply divide-y-4 divide-slate-50;
+    }
+
+    li {
+      @apply bg-slate-200 p-2 transition;
+      @apply hover:cursor-pointer hover:bg-slate-300;
+
+      h2 {
+        @apply text-lg font-semibold text-slate-800;
+      }
+
+      p {
+        @apply text-sm text-slate-600;
+      }
+
+      &:first-child {
+        @apply rounded-t-lg;
+      }
+
+      &:last-child {
+        @apply rounded-b-lg;
+      }
+    }
+  }
+</style>

@@ -17,7 +17,10 @@ const isActive = href === pathname || (href !== "/" && pathname.replace(/\/$/, "
 
 <a
   href={href}
-  class:list={["w-fit no-underline text-sm lg:text-base text-slate-600 font-regular px-1 h-fit rounded", { "bg-slate-200 shadow-inner font-semibold": isActive }]}
+  class:list={[
+    "font-regular h-fit w-fit rounded px-1 text-sm text-slate-600 no-underline lg:text-base",
+    { "bg-slate-200 font-semibold shadow-inner": isActive },
+  ]}
   {...props}
 >
   <slot />

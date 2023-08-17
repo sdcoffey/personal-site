@@ -1,54 +1,57 @@
 ---
-import { Image } from 'astro:assets';
+import { Image } from "astro:assets";
 
-import HeaderLink from './HeaderLink.astro'
-import Bars3 from 'astro-heroicons/outline/Bars3.astro';
-import X from 'astro-heroicons/outline/XMark.astro';
+import HeaderLink from "./HeaderLink.astro";
+import Bars3 from "astro-heroicons/outline/Bars3.astro";
+import X from "astro-heroicons/outline/XMark.astro";
 
-import githubmark from '../assets/github-mark.svg';
-import linkedinmark from '../assets/linkedin.svg';
-import twittermark from '../assets/twitter.svg'
+import githubmark from "../assets/github-mark.svg";
+import linkedinmark from "../assets/linkedin.svg";
+import twittermark from "../assets/twitter.svg";
 
-const githubUrl = 'https://github.com/sdcoffey';
-const linkedinUrl = 'https://linkedin.com/in/stevendcoffey';
-const twitterUrl = 'https://twitter.com/stevendcoffey';
+const githubUrl = "https://github.com/sdcoffey";
+const linkedinUrl = "https://linkedin.com/in/stevendcoffey";
+const twitterUrl = "https://twitter.com/stevendcoffey";
 
 const externalLinks = [
-  {url: githubUrl, label: "Github", icon: githubmark, alt: "My Github" },
-  {url: linkedinUrl, label: "Linkedin", icon: linkedinmark, alt: "My Linkedin" },
-  {url: twitterUrl, label: "Twitter", icon: twittermark, alt: "My Twitter" },
-]
+  { url: githubUrl, label: "Github", icon: githubmark, alt: "My Github" },
+  { url: linkedinUrl, label: "Linkedin", icon: linkedinmark, alt: "My Linkedin" },
+  { url: twitterUrl, label: "Twitter", icon: twittermark, alt: "My Twitter" },
+];
 ---
 
-<nav class="navigation z-10 flex w-full bg-slate-50 lg:w-fit fixed right-0 top-0 left-0 justify-between lg:justify-start lg:flex-col p-4 lg:p-8 gap-8">
+<nav
+  class="navigation fixed left-0 right-0 top-0 z-10 flex w-full justify-between gap-8 bg-slate-50 p-4 lg:w-fit lg:flex-col lg:justify-start lg:p-8"
+>
   <button class="navigation__mobile-nav-toggle hidden">
-    <Bars3 class="w-6 h-6 text-slate-600 hover:text-black" />
+    <Bars3 class="h-6 w-6 text-slate-600 hover:text-black" />
   </button>
 
-  <div class="flex items-center lg:items-start lg:flex-col gap-1">
-    <h2 class="hidden lg:block font-bold text-sm text-slate-600">Stuff here</h2>
+  <div class="flex items-center gap-1 lg:flex-col lg:items-start">
+    <h2 class="hidden text-sm font-bold text-slate-600 lg:block">Stuff here</h2>
     <HeaderLink href="/">Home</HeaderLink>
     <HeaderLink href="/blog">Blog</HeaderLink>
     <HeaderLink href="/resume">Resume</HeaderLink>
   </div>
 
-  <div class="hidden lg:flex lg:flex-col gap-1">
-    <h2 class="font-bold text-sm text-slate-600">Stuff elsewhere</h2>
-    {externalLinks.map(link => (
-        <HeaderLink href={link.url} external={true}>{link.label}</HeaderLink>
-    ))}
+  <div class="hidden gap-1 lg:flex lg:flex-col">
+    <h2 class="text-sm font-bold text-slate-600">Stuff elsewhere</h2>
+    {
+      externalLinks.map((link) => (
+        <HeaderLink href={link.url} external={true}>
+          {link.label}
+        </HeaderLink>
+      ))
+    }
   </div>
 
-  <div class="flex lg:hidden flex-row py-1 px-2 justify-start gap-3 md:gap-5">
-    {externalLinks.map(link => (
+  <div class="flex flex-row justify-start gap-3 px-2 py-1 md:gap-5 lg:hidden">
+    {
+      externalLinks.map((link) => (
         <a href={link.url} target="_blank" rel="noreferrer">
-          <Image
-              width={24}
-              height={24}
-              src={link.icon}
-              class="h-4 w-4 md:h-6 md:w-6"
-              alt={link.alt} />
+          <Image width={24} height={24} src={link.icon} class="h-4 w-4 md:h-6 md:w-6" alt={link.alt} />
         </a>
-    ))}
+      ))
+    }
   </div>
 </nav>
