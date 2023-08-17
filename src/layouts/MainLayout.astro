@@ -1,5 +1,5 @@
 ---
-import { BaseHead, HeaderLink } from "../components";
+import { BaseHead, Nav, HeaderLink } from "../components";
 
 import { Image } from "astro:assets";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
@@ -21,31 +21,13 @@ const { docTitle, docDescription, title, showNav } = Astro.props;
   <head>
     <BaseHead title={docTitle ?? SITE_TITLE} description={docDescription ?? SITE_DESCRIPTION} />
   </head>
-  <body class="min-h-screen w-screen bg-slate-50 py-32">
+  <body class="min-h-screeo w-screen bg-slate-50 py-32">
+  {
+      showNav && (
+          <Nav />
+      )
+  }
     <div class="mx-auto px-8 lg:max-w-prose lg:px-0">
-      <div class="flex flex-col gap-4">
-        <a href="/">
-          <Image
-            src={steve}
-            alt="Photo of Steve"
-            format="webp"
-            quality="med"
-            height={160}
-            wdith={160}
-            class="h-20 w-20 rounded-full"
-          />
-        </a>
-        <h1>{title}</h1>
-        {
-          showNav && (
-            <nav class="flex w-full flex-row gap-2">
-              <HeaderLink href="/">About</HeaderLink>
-              <HeaderLink href="/blog">Blog</HeaderLink>
-            </nav>
-          )
-        }
-      </div>
-      <hr class="my-12 border-slate-200" />
       <main><slot /></main>
     </div>
   </body>
