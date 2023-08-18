@@ -1,44 +1,69 @@
 ---
 title: "On ImportMaps and the future of JS delivery"
-description: "Lorem ipsum dolor sit amet"
-pubDate: 2023-08-17
+description: A look at import maps and why you should be adopting them in your next project
+pubDate: 2023-08-15
 heroImage: ../../assets/placeholder-hero.jpg
+draft: true
 ---
 
-import steve from "../../assets/ttc.jpeg";
-import { Image } from "astro:assets";
-import { HeaderLink, CodeBlock } from "../../components";
+import { Footnote, Footnotes } from "../../components";
 
-<CodeBlock
-  code={`
-type Example = { a: number };
-`.trim()}
-  lang="typescript"
-/>
+## HTTP/1
 
-MDX is a special flavor of Markdown that supports embedded JavaScript & JSX syntax. This unlocks the ability to [mix JavaScript and UI Components into your Markdown content](https://docs.astro.build/en/guides/markdown-content/#mdx-features) for things like interactive charts or alerts.
+Back in ancient times (5 years ago), the internet communicated almost exclusively using the HTTP/1.x protocol. This is classical HTTP that we know and love.
+One request out, one response back. Back in the days of the early web, the designers of HTTP didn't expect websites to require much content beyond what could
+be encoded directly into the HTML of a page. This was pre-CSS, pre modern-JS. One request, one webpage 🤝
 
-If you have existing content authored in MDX, this integration will hopefully make migrating to Astro a breeze.
+As the web evolved, so did the need for more content. CSS, JS, images, fonts, and more. We have a rich web and we're all better for it.
+But this came with a problem. Most browsers only allow 6<Footnote source="https://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser#:~:text=220-,HTTP/1.1,-IE%206%20and" text="'Max Parallel HTTP connections' on StackOverflow">1</Footnote> concurrent HTTP/1.x connections to a given host. This means that if you have 10 resources to load,
+you have to wait for the first 6 to finish before the next 4 can even start. This is a problem because we also want _fast_ websites. Fast website = more money.
 
-## Example
+If we want fast, responsive websites, we needed to load our websites in as few requests as possible. Some of these assets, like images, fonts, etc., are hard to do anything about.
 
-<Image
-  src={steve}
-  alt="Photo of Steve"
-  format="webp"
-  quality="med"
-  class="h-48 w-full rounded object-cover object-center"
-/>
+But JS and CSS? We can do something about that.
 
-Here is how you import and use a UI component inside of MDX.
-When you open this page in the browser, you should see the clickable button below.
+## JS Bundling
 
-<HeaderLink href="#" onclick="alert('clicked!')">
-  Embedded component in MDX
-</HeaderLink>
+Enter the JS bundler. The bundler is a tool that takes all of your JS and squishes it into a ball. This is great, since you can load it all in just one request.
+load all of your JS with a single request. This is also bad because it means that you're loading all of your JS with a single request.
+Remember that also around this time, we were starting to see the rise of the client-rendered web apps, built mostly using React.
 
-## More Links
+Guys, I love React, but it's huge. It's just a lot of code. If you're using it, your bundle is already going to be something like 100kb before you add any of your own code.
 
-- [MDX Syntax Documentation](https://mdxjs.com/docs/what-is-mdx)
-- [Astro Usage Documentation](https://docs.astro.build/en/guides/markdown-content/#markdown-and-mdx-pages)
-- **Note:** [Client Directives](https://docs.astro.build/en/reference/directives-reference/#client-directives) are still required to create interactive components. Otherwise, all components in your MDX will render as static HTML (no JavaScript) by default.
+This is bad for performance for a few reasons:
+1. You have to load a lot of code before your page can even start rendering itself. Your user might be on a slow network, which means they have to wait a long time before they can see anything.
+1. Before I get anyone in my email screaming, "But what about gzip??," while it's true that these large bundles of text _do_ compress well, your browser still has to parse them, and this takes time, actually more time than the download in some cases.
+1. Every time you make a change, you bust your cache. This means that your users have to download the entire bundle again, even if you only changed one line of code.
+
+
+[//]: # (This is bad for performance and after a little while everyone got <a href="https://bundlephobia.com" >bundlephobia</a>.)
+
+
+**Why we've bundled**
+
+- Before we had HTTP/2, we had to bundle our JS to keep request count low
+
+**Why we don't need to bundle anymore**
+
+- HTTP/2
+- ES Modules
+
+## ImportMaps as an alternative to bundle splitting
+
+## Use a CDN to deliver your dependencies
+
+Here's the thing: CDNs are _really good_. They're fast, they're reliable, and they're everywhere. They're also free. Unless you're running a static
+site hosted on a CDN, they're also a lot closer to the majority of your users than us-east-1 is.
+
+Don't waste your own valuable CPU cycles delivering someone else's code.
+
+## A slightly opinionated setup
+
+### Esbuild
+
+### Typescript
+
+<br/>
+---
+
+<Footnotes />

@@ -17,16 +17,15 @@ const foss: Foss[] = [
     type: "Author",
     description:
       "Techan is blazing-fast technical analysis toolkit for Go. Use it for analyzing time-series price streams or building complex trading rules.",
-    url: "https://github.com/scoffey/techan",
+    url: "https://github.com/sdcoffey/techan",
     language: "Go",
   },
   {
-    name: "Avo",
-    type: "Contributor",
-    description:
-      "Avo is a drop-in admin dashboard for Rails that helps developers build productive web apps 10x faster.",
-    url: "https://avohq.io/",
-    language: "RB",
+    name: "Big",
+    type: "Author",
+    description: "Big provides an ergonomic, immutable wrapper around Golang's big.Float",
+    url: "https://github.com/sdcoffey/big",
+    language: "Go",
   },
   {
     name: "Buzz.js",
@@ -36,11 +35,19 @@ const foss: Foss[] = [
     url: "https://github.com/Flatbook/buzz.js",
     language: "TS",
   },
+  {
+    name: "Avo",
+    type: "Contributor",
+    description:
+      "Avo is a drop-in admin dashboard for Rails that helps developers build productive web apps 10x faster.",
+    url: "https://avohq.io/",
+    language: "RB",
+  },
 ];
 ---
 
 <MainLayout showNav={true} title="Steve Coffey">
-  <article class="padded-container prose prose-slate">
+  <article class="padded-container !md:max-w-prose prose prose-slate !max-w-none">
     <h1 class="page-title">👋 I'm Steve</h1>
     <p>
       I'm an engineer, entrepreneur, and occasionally, an amateur chef. I work up and down the stack but have a special
@@ -51,10 +58,9 @@ const foss: Foss[] = [
 
     <p>Want to get in touch? Drop me a line at <a href="mailto:stevendcoffey@gmail.com">stevendcoffey@gmail.com</a></p>
 
-    <h2>Work</h2>
     <h2>From the blog</h2>
     <div
-      class="grid-rows-auto scrollbar-hidden flex max-w-full snap-x snap-mandatory scroll-px-6 grid-cols-2 gap-4 overflow-x-scroll py-2 md:grid md:snap-none"
+      class="scrollbar-hidden flex max-w-full snap-x snap-mandatory scroll-px-6 gap-4 overflow-x-scroll py-8 md:snap-none"
     >
       {
         posts.map(({ slug, data }) => (
@@ -64,7 +70,7 @@ const foss: Foss[] = [
             heroImage={data.heroImage}
             description={data.description}
             pubDate={data.pubDate}
-            class="md:max-w-1/2 min-w-full snap-start md:max-w-none"
+            class="w-full min-w-[300px] grow snap-start md:min-w-0"
           />
         ))
       }

@@ -15,7 +15,10 @@ const { slug, title, description, pubDate, heroImage, class: className } = Astro
 
 <a
   href={`/blog/${slug}`}
-  class:list={["not-prose bg-slate-40 rounded-lg border border-slate-200 no-underline shadow", className]}
+  class:list={[
+    "not-prose bg-slate-40 rounded-lg border border-slate-200 no-underline shadow transition hover:-translate-y-px hover:shadow-lg",
+    className,
+  ]}
 >
   <div class="relative">
     <Image

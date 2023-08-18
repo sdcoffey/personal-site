@@ -1,0 +1,19 @@
+---
+type Props = {
+  href?: string;
+  text: string;
+};
+---
+
+<a class="footnote-citation no-underline" data-source={Astro.props.source} data-text={Astro.props.text}>
+  <cite>
+    <sup class="citition-slot underline"></sup>
+  </cite>
+</a>
+
+<script>
+  document.querySelectorAll(".footnote-citation").forEach((element: HTMLAnchorElement, index) => {
+    element.querySelector(".citition-slot").textContent = `${index + 1}`;
+    element.href = `#footnote-${index + 1}`;
+  });
+</script>

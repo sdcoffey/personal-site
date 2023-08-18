@@ -24,7 +24,7 @@ const { docTitle, docDescription, title, showNav, showFooter = true } = Astro.pr
   </head>
   <body class="flex min-h-[100dvh] w-screen flex-col bg-slate-50">
     {showNav && <Nav />}
-    <main class="mx-auto w-full grow pt-20 lg:max-w-prose lg:px-0 lg:py-32"><slot /></main>
+    <main class="mx-auto w-full grow py-20 lg:max-w-prose lg:px-0 lg:py-32"><slot /></main>
     <Footer />
   </body>
 </html>

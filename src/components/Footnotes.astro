@@ -1,0 +1,26 @@
+<ol class="footnotes"></ol>
+
+<script>
+  const footnotes = document.querySelectorAll(".footnote-citation");
+  const container = document.querySelector(".footnotes");
+
+  footnotes.forEach((footnote: HTMLAnchorElement) => {
+    const id = footnote.getAttribute("href").replace("#", "");
+    const { text, source } = footnote.dataset;
+    const li = document.createElement("li");
+    li.id = id;
+
+    if (source) {
+      const anchor = document.createElement("a") as HTMLAnchorElement;
+      anchor.href = source;
+      anchor.target = "_blank";
+      anchor.rel = "noopener noreferrer";
+      anchor.innerText = text;
+      li.appendChild(anchor);
+    } else {
+      li.innerText = text;
+    }
+
+    container.appendChild(li);
+  });
+</script>
