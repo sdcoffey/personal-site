@@ -1,3 +1,5 @@
+<hr class="mb-4 mt-12" />
+<h4>Footnotes</h4>
 <ol class="footnotes"></ol>
 
 <script>
@@ -6,13 +8,14 @@
 
   footnotes.forEach((footnote: HTMLAnchorElement) => {
     const id = footnote.getAttribute("href").replace("#", "");
-    const { text, source } = footnote.dataset;
+    const { text, href } = footnote.dataset;
     const li = document.createElement("li");
+    li.classList.add("text-sm");
     li.id = id;
 
-    if (source) {
+    if (href) {
       const anchor = document.createElement("a") as HTMLAnchorElement;
-      anchor.href = source;
+      anchor.href = href;
       anchor.target = "_blank";
       anchor.rel = "noopener noreferrer";
       anchor.innerText = text;

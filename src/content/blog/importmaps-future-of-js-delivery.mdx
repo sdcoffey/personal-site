@@ -6,49 +6,387 @@ heroImage: ../../assets/placeholder-hero.jpg
 draft: true
 ---
 
-import { Footnote, Footnotes } from "../../components";
+import { Aside, CodeBlock, Footnote, Footnotes } from "../../components";
 
-## HTTP/1
+## It's time to give up the bundler!
 
-Back in ancient times (5 years ago), the internet communicated almost exclusively using the HTTP/1.x protocol. This is classical HTTP that we know and love.
-One request out, one response back. Back in the days of the early web, the designers of HTTP didn't expect websites to require much content beyond what could
-be encoded directly into the HTML of a page. This was pre-CSS, pre modern-JS. One request, one webpage 🤝
+I recently stopped bundling my javascript in my rails setup, and opted for a more straightforward approach leveraging **ES Modules** and **importmaps**
+to load and run javascript in the browser. I'm convinced this is the way to go, and I wanted to write a brief explainer on ESM + importmaps and why you
+should think about ditching the bundler in your next project.
 
-As the web evolved, so did the need for more content. CSS, JS, images, fonts, and more. We have a rich web and we're all better for it.
-But this came with a problem. Most browsers only allow 6<Footnote source="https://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser#:~:text=220-,HTTP/1.1,-IE%206%20and" text="'Max Parallel HTTP connections' on StackOverflow">1</Footnote> concurrent HTTP/1.x connections to a given host. This means that if you have 10 resources to load,
-you have to wait for the first 6 to finish before the next 4 can even start. This is a problem because we also want _fast_ websites. Fast website = more money.
+In this post, I want to cover briefly what ES Modules are, what they replace, as well as the historical reasons why we've used bundlers in the past, and why
+continuing to do so might be hurting your page performance.
 
-If we want fast, responsive websites, we needed to load our websites in as few requests as possible. Some of these assets, like images, fonts, etc., are hard to do anything about.
+## What are Javascript Modules?
 
-But JS and CSS? We can do something about that.
+Broadly, a JS module is a way of lexically scoping code to be made selectively available in another module.
+Concretely, it's just a file that declares exports to be available in another file.
 
-## JS Bundling
+There are two main module systems:
+- **CommonJS** (which you'll be familiar with if you've ever written javascript for Node)
+- **ES Modules** (now supported in the browser and used in Deno)
 
-Enter the JS bundler. The bundler is a tool that takes all of your JS and squishes it into a ball. This is great, since you can load it all in just one request.
-load all of your JS with a single request. This is also bad because it means that you're loading all of your JS with a single request.
-Remember that also around this time, we were starting to see the rise of the client-rendered web apps, built mostly using React.
+Here's the same module written for both CJS and ESM:
 
-Guys, I love React, but it's huge. It's just a lot of code. If you're using it, your bundle is already going to be something like 100kb before you add any of your own code.
+```js
+// module.cjs
+const merge = require('lodash').merge;
 
-This is bad for performance for a few reasons:
-1. You have to load a lot of code before your page can even start rendering itself. Your user might be on a slow network, which means they have to wait a long time before they can see anything.
-1. Before I get anyone in my email screaming, "But what about gzip??," while it's true that these large bundles of text _do_ compress well, your browser still has to parse them, and this takes time, actually more time than the download in some cases.
-1. Every time you make a change, you bust your cache. This means that your users have to download the entire bundle again, even if you only changed one line of code.
+function addPi(target) {
+  return merge(target, { pi: 3.14 })
+}
+
+module.exports = addPi;
+```
+
+In this example, when this module is loaded, Node would go looking for `lodash` in our `node_modules/` folder, and make your function, `addPi`, available as a default export to any other modules requiring it.
+
+```js
+// module.esm
+import { merge } from 'https://esm.sh/lodash@4.17.21';
+
+export default function addPi(target) {
+  return merge(target, { pi: 3.14 })
+}
+```
+
+Here, we're able to specify that `lodash` should be imported from a remote URL, in this case the CDN esm.sh.
+
+CommonJS modules have **never been supported in the browser**, while ESM is now supported by Node,
+the vast majority of browsers<Footnote text="Can I use ESM?" href="https://caniuse.com/?search=ESM"/>, and alternative JS runtimes like <a href="https://deno.land/" target="_blank">Deno</a> and <a href="https://bun.sh/" target="_blank">Bun</a>.
+
+## What's an importmap?
+Importmaps are a way to tell the browser where to find javascript (specifically, **ES Modules**) that are included via an `import` from another module.
+
+You might have spotted the immediate problem with the ES Module above, which is one of **dependency management**.
+
+Generally, when you're using outside code, you want to do two things:
+1. Use **specific versions** of your dependencies, so that your code is **deterministic**.
+1. Use the **same version** of that dependency everywhere in your code that it's used.
+
+Without one source of truth for specifying dependency versions, your module resolutions could be scattered across dozens or even hundreds of files! Imagine the headache of updating any of them.
+
+Importmaps are a way to solve both of these problems, by predeclaring where modules should be resolved from, and (if you're using a good CDN), which version is resolved.
+In this way, you can think of an importmap for the browser as serving the same function that `package.json` and `yarn.lock` files serve for in Node/CommonJS contexts.
+
+Here's the same script above rewritten for the browser, using importmaps.
+
+```html
+<!-- index.html -->
+<head>
+  <script type="importmap">
+    {
+      "imports": {
+        "lodash": "https://esm.sh/lodash@4.17.21",
+      }
+    }
+  </script>
+  <script type="module" src="/module.esm"></script>
+</head>
+```
+
+```js
+// module.esm
+import { merge } from 'lodash';
+
+export default function addPi(target) {
+  return merge(target, { pi: 3.14 })
+}
+```
+
+<details>
+    <summary>What's going on here?</summary>
+
+    In our html doc, we've declared two script tags, one with `type="importmap"`, and one with `type="module"`.
+    When the browser parses the second script tag, it will download and execute `module.esm`.
+
+    As it begins to parse `module.esm`, the first statement the interpreter will come across is an import of the `merge` function from `lodash`.
+    Because `lodash` is not an absolute import (starting with `/`), it will refer to the importmap to resolve the module.
+
+    Having resolved `lodash` to `https://esm.sh/lodash@4.17.21`, it will fetch the module, and continue executing `module.esm`.
+</details>
+
+## Why were we bundling again?
+
+This sounds great right? So why were we ever bundling our javascript?
+
+In my estimation there are three historical reasons, and two modern reasons for why we bundle our javascript.
+
+<Aside>
+  <h2 slot="header">Wait--what's bundling?</h2>
+  <p>Tools like Webpack and Rollup take your javascript and all of its dependencies (like React or lodash), as well as normalized references to external assets (like images) and squish them into one big file, called a "bundle".</p>
+</Aside>
+
+### Historical reason 1: the global namespace
+
+Before we started bundling code, we loaded all of our own code as well as external dependencies via script tags.
+The problem is that all non-ESM Javascript loaded in the browser is loaded into the global namespace.
+Commonly, library authors would attach themselves to the global namespace under a
+name they hoped was unique enough not to conflict with your code or other libraries.
+
+You might be old enough to remember writing some code like this:
+
+```html
+<head>
+  <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js"></script>
+</head>
+<body>
+  <div id="my-div"></div>
+
+  <script>
+    var myDiv = $('#my-div');
+  </script>
+</body>
+```
+
+Where is `$` coming from? Well, it's declared in `jquery-3.7.0.slim.min.js`, and available everywhere thereafter.
+
+<details>
+    <summary>I'm not old enough to remember this...</summary>
+
+    Good for you.
+
+    Above, we're importing jQuery by adding a script tag to the `head` of our html pointing at the jQuery CDN.
+    When the browser encounters this tag, it fetches the jQuery source from the CDN, and loads it all into the global namespace.
+
+    jQuery cleverly exposes all of it's functionality through the global operator `$`, so that it's functions don't collide with any of yours,
+    or any from other libraries you might be importing.
+</details>
+
+You yourself had to be careful to not shadow any variable or function names between your own files, or risk unpredictable behavior.
+In this world, organizing code into multiple files and trying to avoid naming collisions and issues with hoisting is a really bad time.
+
+Bundlers help solve this problem in two ways:
+1. Allowing you to resolve dependencies in one place, your `package.json` file.
+1. Enabling the use of CommonJS-style imports between files or dependencies, making it easier to reason about the dependency graph and lexically scope your code.
+
+Bundlers do this by rewriting all of your code and your dependencies to be independently namespaced,
+then replacing calls to `require` or `import` with new functions that reference other parts of the bundle.
+
+[//]: # (As of this writing, nearly 95%<Footnote href="https://caniuse.com/?search=esm" text="Can I use ESM?"/> of browsers support ES Modules.)
+
+<details>
+    <summary>Show me</summary>
+
+    Imagine this very complex code that we want to run in the browser:
+```js
+// math.js
+function add(a, b) {
+  return a + b;
+}
+
+function subtract(a, b) {
+  return a - b;
+}
+
+module.exports = { add, subtract };
+```
+
+```js
+// module.js
+const { add, subtract } = require('./math');
+
+console.log(add(1, 2));
+console.log(subtract(1, 2));
+```
+Unfortunately, this code is **not** going to run in the browser as is, since, as we've established, CommonJS modules are not supported by any browser. Let's run it through esbuild and see what we get.
+
+```js
+// esbuild --bundle module.js
+(() => {
+  var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __commonJS = (cb, mod) => function __require() {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  };
+
+  // math.js
+  var require_math = __commonJS({
+    "math.js"(exports, module) {
+      function add2(a, b) {
+        return a + b;
+      }
+      function subtract2(a, b) {
+        return a - b;
+      }
+      module.exports = { add: add2, subtract: subtract2 };
+    }
+  });
+
+  // module.js
+  var { add, subtract } = require_math();
+  console.log(add(1, 2));
+  console.log(subtract(1, 2));
+})();
+```
+    There's obviously a lot going on there, but the key thing to note is that all of our code is now in one file,
+    and our `require` statement has been replaced with a call to a new function, `require_math` that loads our code from what was previously the standalone file `math.js`.
+
+    All of the code is wrapped in an IIFE (**Immediately Invoked Function Expression**, pronounced "iffy") which keeps any of this code from leaking into the global namespace.
+</details>
+
+### Historical reason 2: HTTP/1.x
+
+In ancient times (pre-2015), browsers supported only the first major version of the HTTP protocol.
+Without getting too into the weeds on the nuances of HTTP, suffice it to say that in HTTP/1.x, only one resource may be loaded for each request made.
+At the end of the request, the TCP connection used to deliver the payload must be closed.
+
+** Add an illustration **
+
+Because modern websites (even in 2015) had lots of images and custom fonts and other resources external to the HTML, the browser had to make many requests to fetch all of these resources.
+However, most browsers would only allow up to six concurrent TCP connections to a host, meaning that if you had more than six assets to fetch from your server, you had to wait for the first six to finish before requesting more.
+If you're using HTTPS (and I hope you are), that means that every new TCP connection requires a new TLS handshake, increasing further the number of roundtrips required.
+This makes pageloads slow. Slow pages = less money.
+
+** Add an illustration **
+
+Bundling Javascript was a convenient way to reduce the number of requests needed to fetch all of your scripts. Since all your javascript is now squished into one big file, you've eliminated potentially dozens of requests.
+
+#### HTTP/2
+
+With HTTP/2, browsers may _re-use_ TCP connections to the same host, and servers on the other end may even eagerly push resources to the client before they're requested, greatly increasing pageload performance.
+
+HTTP/2 is now supported by 96%<Footnote href="https://caniuse.com/?search=http%2F2" text="Can I use HTTP/2?" /> of browsers.
 
 
-[//]: # (This is bad for performance and after a little while everyone got <a href="https://bundlephobia.com" >bundlephobia</a>.)
+### Historical reason 3: ES6 support
 
+Until several years ago, not all browsers supported ES6 features we know and rely on, like classes, arrow functions, the `const` keyword, and too many others to name.
+These features are incredible, and make writing Javascript 100x more pleasant. But because ES6 support was slow to roll out, some transpilation of ES6 was required to ensure
+your code would work in browsers that did not yet support ES6. This ES**X** → ES5 transpilation was and remains one of the jobs of the bundler.
 
-**Why we've bundled**
+Today, 96%<Footnote href="https://caniuse.com/?search=es6" text="Can I use ES6?" /> of browsers support ES6 features natively without the need for transpilation.
 
-- Before we had HTTP/2, we had to bundle our JS to keep request count low
+### Modern reason 1: Assets
 
-**Why we don't need to bundle anymore**
+Depending on what your stack looks like, you might need to reference external assets, like images, from your JS. This is also one of the jobs of the bundler.
+Let's look at a React example:
 
-- HTTP/2
-- ES Modules
+```jsx
+// react.jsx
+import plus from "./plus.svg";
 
-## ImportMaps as an alternative to bundle splitting
+export default function Counter() {
+  return (
+    <button>
+      <img src={plus} />
+    </button>
+  );
+}
+```
+
+When we run this through esbuild, we get the following output, with the svg inlined directly into the bundle as a URL.
+
+```js
+// esbuild --bundle --loader:.svg=dataurl --jsx=automatic react.jsx
+
+var plus_default =
+  'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">%0A  <path d="M10.75 6.75a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" />%0A</svg>%0A';
+
+// react.jsx
+var import_jsx_runtime = __toESM(require_jsx_runtime());
+function Counter() {
+  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+    children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+      src: plus_default,
+    }),
+  });
+}
+```
+
+### Modern reason 2: JSX
+
+If you're old enough to recognize my jQuery example above, you're probably also old enough to remember that HTML wasn't always a regular fixture in our client-side JS.
+React popularized the concept of HTML-in-JS (known as JSX), and is largely responsible for making it a mainstream part of our dev toolkit.
+
+It's worth noting that my `react.jsx` example above won't run in the browser as is. JSX is not a supported part of the JS spec, the interpreter won't know what to do with all those angle brackets.
+When we transpile that code, the transpiler is ripping out all of that HTML and replacing it with call to a library function.
+
+Here are the relevant sections again for clarity:
+
+```jsx
+// react.jsx
+return (
+  <button>
+    <img src={plus} />
+  </button>
+);
+```
+
+Is transpiled into:
+```js
+return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+  children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+    src: plus_default,
+  }),
+});
+```
+
+<details>
+  <summary>What's `import_jsx_runtime.jsx`?</summary>
+
+  Depending on what specific JSX-focused framework you're using, your transpiler will use some library function to
+  create or update a DOM element from your JSX tree.
+
+  In this example `import_jsx_runtime.jsx` points to React's `jsx-runtime` package. You might also remember `React.createElement` from older versions of React, or
+  simply `h` in Preact.
+</details>
+
+<br/>
+
+<Aside>
+  <h2 slot="header">Transpilation vs Bundling</h2>
+
+  <p>
+    I think it is easy to conflate the two concepts, as I have above, but I do want to be clear about the difference between _transpilation_ and _bundling_.
+
+    <br/>
+    **Bundling**, again, is simply the process of concatenating JS code from distinct files into one, larger bundle, and inlining external assets into the same.
+
+    <br/>
+    **Transpiling** is the process of transforming your code into **semantically identical but syntactically different** code.
+
+    <br/>
+    Transpilation might occur because you're using ES6 features but are targeting browsers that only support ES5, or in this case, because
+    you want to use JSX instead of writing `React.createElement` everywhere.
+  </p>
+</Aside>
+
+Before I get a howler about having conflated transpilation and bundling in this example, I want to argue that in 2023, many devs
+would find the distinction to have little difference, as they are rarely used independently. The extent to which the relationship between transpiling and bundling has been conjoined in the JS zeitgeist I think is attributable to the wild popularity of tools like Webpack and Vite,
+which serve transparently as both transpiler and bundler.
+
+Later, we'll cover my preferred setup, using esbuild to **transpile only**, which allows us to use these great client-side
+frameworks without bundling, and get a lot of free pageload performance as a result.
+
+## Why not bundle?
+
+As we've covered, I think there are many good historical reasons why we've bundled our JS in the past, but I think there are some pretty
+strong reasons to stop bundling JS code.
+
+### Pageload performance
+
+As we covered [above](#historical-reason-2-http1x), with the advent of HTTP/2, serving multiple assets from the same server is much more efficient than it used to be.
+Unless you're serving hundreds of js files to your client, it's probably not worth bundling them together. We get a huge bump in pageload performance for free just by using HTTP/2.
+
+<details>
+  <summary>Am I using HTTP/2?</summary>
+  Probably
+
+  ** Write more **
+</details>
+
+There are actually some explicit performance benefits to be gained by serving individual ES Modules, the first being:
+
+#### Cacheability
+
+Browsers aggressively cache assets from pages you visit. If you've ever cleared your browser cache, you know that it can balloon in size, often into the gigabytes.
+
+So what is all this stuff? It's CSS, JS, images, fonts, and a host of other assets that webpages use to display rich content. The browser caches them so that when you visit a webpage a second time,
+you don't have to download that stuff again.
+
+#### JS Parsing
+
+### You (probably) don't need sourcemaps anymore!
 
 ## Use a CDN to deliver your dependencies
 
@@ -62,8 +400,5 @@ Don't waste your own valuable CPU cycles delivering someone else's code.
 ### Esbuild
 
 ### Typescript
-
-<br/>
----
 
 <Footnotes />

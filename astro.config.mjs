@@ -1,4 +1,5 @@
 import mdx from "@astrojs/mdx";
+import remarkToc from "remark-toc";
 import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
 
@@ -12,6 +13,9 @@ export default defineConfig({
   },
   markdown: {
     draft: true,
+    remarkPlugins: [
+        [remarkToc, { heading: "In this post" }],
+    ],
   },
   integrations: [
     mdx({

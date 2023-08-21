@@ -9,7 +9,7 @@ type Props = {
 const { code, lang } = Astro.props;
 ---
 
-<div class="relative rounded-lg bg-slate-800 p-4">
+<div class="relative my-6 rounded-lg bg-slate-800 p-4">
   <button
     data-code-copy-button
     data-code-copy-content={code}
@@ -30,7 +30,7 @@ const { code, lang } = Astro.props;
       ></path>
     </svg>
   </button>
-  <Code code={code} lang={lang} />
+  <Code code={code.trim()} lang={lang} />
 </div>
 
 <script>
