@@ -10,11 +10,50 @@
 <style is:global>
   .aside {
     .header-container * {
-      @apply text-base font-bold italic text-blue-800;
+      @apply my-0 text-base font-bold italic text-blue-800;
     }
 
     .body-container {
       @apply text-sm;
+    }
+
+    ol {
+      @apply my-4 list-outside list-decimal space-y-2 pl-4;
+    }
+
+    p {
+      @apply mb-4 mt-4;
+
+      &:last-child {
+        @apply mb-0;
+      }
+    }
+
+    a {
+      @apply font-medium underline;
+    }
+
+    pre.astro-code {
+      code {
+        @apply !font-normal;
+        &:before {
+          content: "" !important;
+        }
+        &:after {
+          content: "" !important;
+        }
+      }
+    }
+
+    code {
+      @apply font-bold;
+
+      &:before {
+        content: "`";
+      }
+      &:after {
+        content: "`";
+      }
     }
   }
 </style>

@@ -6,6 +6,8 @@ heroImage: ../../assets/placeholder-hero.jpg
 draft: true
 ---
 
+import scriptingWheel from "../../assets/scripting-wheel.png";
+import { Image } from "astro:assets";
 import { Aside, CodeBlock, Footnote, Footnotes } from "../../components";
 
 ## It's time to give up the bundler!
@@ -14,7 +16,7 @@ I recently stopped bundling my javascript in my rails setup, and opted for a mor
 to load and run javascript in the browser. I'm convinced this is the way to go, and I wanted to write a brief explainer on ESM + importmaps and why you
 should think about ditching the bundler in your next project.
 
-In this post, I want to cover briefly what ES Modules are, what they replace, as well as the historical reasons why we've used bundlers in the past, and why
+In this post, I want to cover briefly what ES Modules are, what they can replace, as well as the historical reasons why we've used bundlers in the past, and why
 continuing to do so might be hurting your page performance.
 
 ## What are Javascript Modules?
@@ -23,6 +25,7 @@ Broadly, a JS module is a way of lexically scoping code to be made selectively a
 Concretely, it's just a file that declares exports to be available in another file.
 
 There are two main module systems:
+
 - **CommonJS** (which you'll be familiar with if you've ever written javascript for Node)
 - **ES Modules** (now supported in the browser and used in Deno)
 
@@ -30,10 +33,10 @@ Here's the same module written for both CJS and ESM:
 
 ```js
 // module.cjs
-const merge = require('lodash').merge;
+const merge = require("lodash").merge;
 
 function addPi(target) {
-  return merge(target, { pi: 3.14 })
+  return merge(target, { pi: 3.14 });
 }
 
 module.exports = addPi;
@@ -43,10 +46,10 @@ In this example, when this module is loaded, Node would go looking for `lodash` 
 
 ```js
 // module.esm
-import { merge } from 'https://esm.sh/lodash@4.17.21';
+import { merge } from "https://esm.sh/lodash@4.17.21";
 
 export default function addPi(target) {
-  return merge(target, { pi: 3.14 })
+  return merge(target, { pi: 3.14 });
 }
 ```
 
@@ -56,11 +59,13 @@ CommonJS modules have **never been supported in the browser**, while ESM is now 
 the vast majority of browsers<Footnote text="Can I use ESM?" href="https://caniuse.com/?search=ESM"/>, and alternative JS runtimes like <a href="https://deno.land/" target="_blank">Deno</a> and <a href="https://bun.sh/" target="_blank">Bun</a>.
 
 ## What's an importmap?
+
 Importmaps are a way to tell the browser where to find javascript (specifically, **ES Modules**) that are included via an `import` from another module.
 
 You might have spotted the immediate problem with the ES Module above, which is one of **dependency management**.
 
 Generally, when you're using outside code, you want to do two things:
+
 1. Use **specific versions** of your dependencies, so that your code is **deterministic**.
 1. Use the **same version** of that dependency everywhere in your code that it's used.
 
@@ -77,7 +82,7 @@ Here's the same script above rewritten for the browser, using importmaps.
   <script type="importmap">
     {
       "imports": {
-        "lodash": "https://esm.sh/lodash@4.17.21",
+        "lodash": "https://esm.sh/lodash@4.17.21"
       }
     }
   </script>
@@ -87,10 +92,10 @@ Here's the same script above rewritten for the browser, using importmaps.
 
 ```js
 // module.esm
-import { merge } from 'lodash';
+import { merge } from "lodash";
 
 export default function addPi(target) {
-  return merge(target, { pi: 3.14 })
+  return merge(target, { pi: 3.14 });
 }
 ```
 
@@ -104,6 +109,7 @@ export default function addPi(target) {
     Because `lodash` is not an absolute import (starting with `/`), it will refer to the importmap to resolve the module.
 
     Having resolved `lodash` to `https://esm.sh/lodash@4.17.21`, it will fetch the module, and continue executing `module.esm`.
+
 </details>
 
 ## Why were we bundling again?
@@ -114,7 +120,8 @@ In my estimation there are three historical reasons, and two modern reasons for 
 
 <Aside>
   <h2 slot="header">Wait--what's bundling?</h2>
-  <p>Tools like Webpack and Rollup take your javascript and all of its dependencies (like React or lodash), as well as normalized references to external assets (like images) and squish them into one big file, called a "bundle".</p>
+    Tools like Webpack and Rollup take your javascript and all of its dependencies (like React or lodash), as well as
+    normalized references to external assets (like images) and squish them into one big file, called a "bundle".
 </Aside>
 
 ### Historical reason 1: the global namespace
@@ -134,7 +141,7 @@ You might be old enough to remember writing some code like this:
   <div id="my-div"></div>
 
   <script>
-    var myDiv = $('#my-div');
+    var myDiv = $("#my-div");
   </script>
 </body>
 ```
@@ -151,24 +158,25 @@ Where is `$` coming from? Well, it's declared in `jquery-3.7.0.slim.min.js`, and
 
     jQuery cleverly exposes all of it's functionality through the global operator `$`, so that it's functions don't collide with any of yours,
     or any from other libraries you might be importing.
+
 </details>
 
 You yourself had to be careful to not shadow any variable or function names between your own files, or risk unpredictable behavior.
 In this world, organizing code into multiple files and trying to avoid naming collisions and issues with hoisting is a really bad time.
 
 Bundlers help solve this problem in two ways:
+
 1. Allowing you to resolve dependencies in one place, your `package.json` file.
 1. Enabling the use of CommonJS-style imports between files or dependencies, making it easier to reason about the dependency graph and lexically scope your code.
 
 Bundlers do this by rewriting all of your code and your dependencies to be independently namespaced,
 then replacing calls to `require` or `import` with new functions that reference other parts of the bundle.
 
-[//]: # (As of this writing, nearly 95%<Footnote href="https://caniuse.com/?search=esm" text="Can I use ESM?"/> of browsers support ES Modules.)
-
 <details>
     <summary>Show me</summary>
 
     Imagine this very complex code that we want to run in the browser:
+
 ```js
 // math.js
 function add(a, b) {
@@ -184,20 +192,22 @@ module.exports = { add, subtract };
 
 ```js
 // module.js
-const { add, subtract } = require('./math');
+const { add, subtract } = require("./math");
 
 console.log(add(1, 2));
 console.log(subtract(1, 2));
 ```
+
 Unfortunately, this code is **not** going to run in the browser as is, since, as we've established, CommonJS modules are not supported by any browser. Let's run it through esbuild and see what we get.
 
 ```js
 // esbuild --bundle module.js
 (() => {
   var __getOwnPropNames = Object.getOwnPropertyNames;
-  var __commonJS = (cb, mod) => function __require() {
-    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-  };
+  var __commonJS = (cb, mod) =>
+    function __require() {
+      return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+    };
 
   // math.js
   var require_math = __commonJS({
@@ -209,7 +219,7 @@ Unfortunately, this code is **not** going to run in the browser as is, since, as
         return a - b;
       }
       module.exports = { add: add2, subtract: subtract2 };
-    }
+    },
   });
 
   // module.js
@@ -218,35 +228,36 @@ Unfortunately, this code is **not** going to run in the browser as is, since, as
   console.log(subtract(1, 2));
 })();
 ```
+
     There's obviously a lot going on there, but the key thing to note is that all of our code is now in one file,
     and our `require` statement has been replaced with a call to a new function, `require_math` that loads our code from what was previously the standalone file `math.js`.
 
     All of the code is wrapped in an IIFE (**Immediately Invoked Function Expression**, pronounced "iffy") which keeps any of this code from leaking into the global namespace.
+
 </details>
 
 ### Historical reason 2: HTTP/1.x
 
 In ancient times (pre-2015), browsers supported only the first major version of the HTTP protocol.
-Without getting too into the weeds on the nuances of HTTP, suffice it to say that in HTTP/1.x, only one resource may be loaded for each request made.
-At the end of the request, the TCP connection used to deliver the payload must be closed.
+Without getting too into the weeds on the nuances of HTTP, suffice it to say that in HTTP/1.x, the relationship between requests and the underlying TCP connection is 1:1. That is, only one resource may be loaded for each TCP connection.
 
-** Add an illustration **
+The issue is that if you're using TLS (and I hope you are), the client needs to make at least two round trips before the request is made simply to establish the connection, before any bytes relevant to your application can be served.
+Then, when the request is finished, you have to close this connection and start fresh on the next request.
 
 Because modern websites (even in 2015) had lots of images and custom fonts and other resources external to the HTML, the browser had to make many requests to fetch all of these resources.
 However, most browsers would only allow up to six concurrent TCP connections to a host, meaning that if you had more than six assets to fetch from your server, you had to wait for the first six to finish before requesting more.
-If you're using HTTPS (and I hope you are), that means that every new TCP connection requires a new TLS handshake, increasing further the number of roundtrips required.
-This makes pageloads slow. Slow pages = less money.
+
+Because we're doing a new TLS handshake for every request, as highlighted above, that's at least 2x more server roundtrips for every additional resource!
 
 ** Add an illustration **
 
-Bundling Javascript was a convenient way to reduce the number of requests needed to fetch all of your scripts. Since all your javascript is now squished into one big file, you've eliminated potentially dozens of requests.
+Bundling Javascript was a convenient way to reduce the number of requests needed to fetch all of your scripts. Since all your javascript is now squished into one big file, you've eliminated potentially dozens of server roundtrips.
 
 #### HTTP/2
 
 With HTTP/2, browsers may _re-use_ TCP connections to the same host, and servers on the other end may even eagerly push resources to the client before they're requested, greatly increasing pageload performance.
 
 HTTP/2 is now supported by 96%<Footnote href="https://caniuse.com/?search=http%2F2" text="Can I use HTTP/2?" /> of browsers.
-
 
 ### Historical reason 3: ES6 support
 
@@ -274,7 +285,7 @@ export default function Counter() {
 }
 ```
 
-When we run this through esbuild, we get the following output, with the svg inlined directly into the bundle as a URL.
+When we run this through esbuild, we get the following output, with the svg inlined directly into the bundle as a URL string.
 
 ```js
 // esbuild --bundle --loader:.svg=dataurl --jsx=automatic react.jsx
@@ -313,6 +324,7 @@ return (
 ```
 
 Is transpiled into:
+
 ```js
 return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
   children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
@@ -324,31 +336,29 @@ return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
 <details>
   <summary>What's `import_jsx_runtime.jsx`?</summary>
 
-  Depending on what specific JSX-focused framework you're using, your transpiler will use some library function to
-  create or update a DOM element from your JSX tree.
+Depending on what specific JSX-focused framework you're using, your transpiler will use some library function to
+create or update a DOM element from your JSX tree.
 
-  In this example `import_jsx_runtime.jsx` points to React's `jsx-runtime` package. You might also remember `React.createElement` from older versions of React, or
-  simply `h` in Preact.
+In this example `import_jsx_runtime.jsx` points to React's `jsx-runtime` package. You might also remember `React.createElement` from older versions of React, or
+simply `h` in Preact.
+
 </details>
 
-<br/>
+<br />
 
 <Aside>
   <h2 slot="header">Transpilation vs Bundling</h2>
 
-  <p>
+  <slot>
     I think it is easy to conflate the two concepts, as I have above, but I do want to be clear about the difference between _transpilation_ and _bundling_.
 
-    <br/>
     **Bundling**, again, is simply the process of concatenating JS code from distinct files into one, larger bundle, and inlining external assets into the same.
 
-    <br/>
     **Transpiling** is the process of transforming your code into **semantically identical but syntactically different** code.
 
-    <br/>
     Transpilation might occur because you're using ES6 features but are targeting browsers that only support ES5, or in this case, because
     you want to use JSX instead of writing `React.createElement` everywhere.
-  </p>
+  </slot>
 </Aside>
 
 Before I get a howler about having conflated transpilation and bundling in this example, I want to argue that in 2023, many devs
@@ -366,14 +376,8 @@ strong reasons to stop bundling JS code.
 ### Pageload performance
 
 As we covered [above](#historical-reason-2-http1x), with the advent of HTTP/2, serving multiple assets from the same server is much more efficient than it used to be.
-Unless you're serving hundreds of js files to your client, it's probably not worth bundling them together. We get a huge bump in pageload performance for free just by using HTTP/2.
-
-<details>
-  <summary>Am I using HTTP/2?</summary>
-  Probably
-
-  ** Write more **
-</details>
+Unless you're serving literally hundreds of js files to your client, it's probably not worth bundling them together. We get a huge bump in pageload performance for free just by using HTTP/2
+to efficiently serve resources over one TCP connection.
 
 There are actually some explicit performance benefits to be gained by serving individual ES Modules, the first being:
 
@@ -384,21 +388,332 @@ Browsers aggressively cache assets from pages you visit. If you've ever cleared 
 So what is all this stuff? It's CSS, JS, images, fonts, and a host of other assets that webpages use to display rich content. The browser caches them so that when you visit a webpage a second time,
 you don't have to download that stuff again.
 
+Good frameworks will often rewrite the names of your assets to add a content-based `fingerprint` to the filename to help browsers know
+if they've already cached some version of a file. If you change the file in any way, it gets a new fingerprint to let the browser know
+that it's a different file.
+
+<Aside>
+    <h2 slot="header">For example:</h2>
+    <slot>
+    Imagine that we have this simple JS file served by our app:
+    ```js
+    // time.js
+    export function getTime() { return new Date() }
+    ```
+
+    Most frameworks will give this file a fingerprinted name. Sprockets (the asset pipeline for Rails), will assign this file the name:
+    ```
+    time-e96f2a9555d6e40450555a1c2a52da3c59175e85043a59c3f2568a0f35770e51.js
+         ^ -------------- this is the fingerprint ----------------------^
+    ```
+
+    Let's say I get bored with the `function` keyword:
+    ```js
+    // time.js
+    export const getTime = () => new Date();
+    ```
+
+    Guess what? Now it has a new fingerprint:
+    ```
+    time-42c814022932fa83186babe7c496f82947d17c415aaa8bbc31b469b91ebdc5cb.js
+    ```
+    </slot>
+</Aside>
+
+In the above example, my change of heart with respect to the `function` keyword only invalidated 47 bytes of JS. If this had been part of a large bundle including other modules and dependencies, it might have invalidated hundreds of kilobytes or more.
+
+When you serve many small ES modules, the browser only needs to re-download those that have changed since it last saw your webpage.
+Because you're very unlikely to touch every file every time you push a new update, you'll end up serving very little incremental JS to the browser.
+
 #### JS Parsing
 
-### You (probably) don't need sourcemaps anymore!
+We've talked a lot about downloading as a major performance factor for JS, but what the browser does once the JS is
+downloaded can have a bigger drag on performance.
 
-## Use a CDN to deliver your dependencies
+Once the browser finishes downloading your JS, it has to parse the JS and compile it to run efficiently in the browser before any of the code can be executed<Footnote text="Raj Rajhans: How JS code gets executed in the browser" href="https://rajrajhans.com/2021/06/how-js-code-runs-in-browser" />.
+This can be a more expensive process than the download itself.
 
-Here's the thing: CDNs are _really good_. They're fast, they're reliable, and they're everywhere. They're also free. Unless you're running a static
-site hosted on a CDN, they're also a lot closer to the majority of your users than us-east-1 is.
+<figure>
+  <Image
+    src={scriptingWheel}
+    width={732}
+    height={404}
+    format="webp"
+    alt={"Time spent with a bundle of 437kb in size"}
+  />
+  <figcaption>Time spent executing a 437kb bundle on my M1 Max MBP</figcaption>
+</figure>
 
-Don't waste your own valuable CPU cycles delivering someone else's code.
+The above figure demonstrates JS activity by category for a 437kb bundle from [factor.fyi](https://factor.fyi). The lion's share of time, **382ms** is due to "scripting"
+which is any JS activity blocking the main thread. Of this, **119ms** is attributable to parsing and compiling.
 
-## A slightly opinionated setup
+Compare this with the download time of this bundle at just **75ms**.
 
-### Esbuild
+If your page is heavily dependent on JS for client interactivity, having a large bundle can delay how long
+it takes for your page to become interactive. Moreover, the ability of popular devices to efficiently parse and compile
+JS varies wildly.<Footnote text="Addi Osmani: Javascript Startup Optimization" href="https://web.dev/optimizing-content-efficiency-javascript-startup-optimization/#parsecompile" />
+Mobile devices, especially low-cost Android mobile phones, could expect to see parsing and compiling times 3-4x what you would get on higher-end hardware.
+
+While using ES Modules to serve your JS isn't going to make parsing faster, it provides a built-in mechanism for code-splitting, helping reduce the
+amount of unused JS on your page that the browser has to parse before your page can become interactive.
+
+## My setup
+
+### Rails Sprockets + ImportMaps
+
+I use Rails and Sprockets to build 99% of my web projects. I'll save why for another post, but I have a very simple setup for building importmaps in Rails.
+
+<CodeBlock
+tabs={[
+  {
+    language: "ruby",
+    filename: "config/initializers/import_map.rb",
+    code: `
+# frozen_string_literal: true
+
+require_relative '../../app/lib/import_map'
+
+ImportMap.configure do |map|
+  # "import" is an external dependency
+  map.import '@hotwired/stimulus'
+  map.import '@hotwired/turbo-rails'
+  map.import 'preact', include_subpackages: true
+  map.import 'framer-motion', alias: 'react:preact/compat'
+  map.import 'dayjs', include_subpackages: true
+
+  # "module" is a local module
+  map.module 'dayjs-init'
+
+  # "mount_directory" adds all modules from a given dir, optionally recursive
+  map.mount_directory 'controllers'
+end
+
+# This will translate to something like:
+=begin
+{
+  "imports": {
+    "@hotwired/stimulus": "https://esm.sh/@hotwired/stimulus@^3.2.2?",
+    "@hotwired/turbo-rails": "https://esm.sh/@hotwired/turbo-rails@^7.3.0?",
+    "preact": "https://esm.sh/preact@^10.15.0?",
+    "preact/": "https://esm.sh/preact@^10.15.0&/",
+    "framer-motion": "https://esm.sh/framer-motion@^10.12.18?alias=react%3Apreact%2Fcompat",
+    "dayjs": "https://esm.sh/dayjs@^1.11.9?",
+    "dayjs/": "https://esm.sh/dayjs@^1.11.9&/",
+    "dayjs-init": "/assets/javascript/dayjs-init-ec6c761b40bf461c97802604889b78483fba390ed83fcb83392ec41c42335cd7.js",
+    "controllers/video-animator": "/assets/javascript/controllers/video-animator-4ad13c3a74253bc208a6d3ec79d8c3d65817f3ecd1de9759f18945c6d413c882.js"
+  }
+}
+=end
+`
+  },
+  {
+    language: "erb",
+    filename: "app/layouts/application.html.erb",
+    code: `
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+
+    <script type="importmap">
+      <%= ImportMap.to_json.html_safe %>
+    </script>
+
+    ...
+`
+  },
+  {
+    filename: "app/lib/import_map.rb",
+    language: "ruby",
+    class: "scrollable-code",
+    code: `
+# frozen_string_literal: true
+
+class ImportMap
+  class Configuration
+    def initialize
+      @imports = []
+      @modules = Set.new
+    end
+
+    def import(name, **options)
+      dep_alias, include_subpackages = options.values_at(:alias, :include_subpackages)
+
+      version = package_version(name)
+      @imports << { name:, version:, remote: remote_specifier(name, version, dep_alias:) }
+
+      return unless include_subpackages
+
+      slash_name = "#{name}/"
+      @imports << { name: slash_name, version:, remote: remote_specifier(name, version, dep_alias:, slash: true) }
+    end
+
+    def module(name)
+      @modules.add(name)
+    end
+
+    def mount_directory(folder, recursive: false)
+      root_path = Rails.root.join('app/javascript', folder)
+      globbable = Rails.root.join("#{root_path}/*.{ts,tsx}").to_s
+      globbable = Rails.root.join("#{root_path}/**/*.{ts,tsx}").to_s if recursive
+
+      Rails.root.glob(globbable).map(&:to_s).each do |path|
+        next if path.include?('.test')
+
+        relative_to_root = Pathname.new(path).relative_path_from(root_path).dirname
+        joinable = [folder, relative_to_root, File.basename(path, File.extname(path))].reject { _1.to_s == '.' }
+        module_name = File.join(*joinable)
+        @modules << module_name
+      end
+    end
+
+    attr_reader :imports, :modules
+
+    private
+
+    def package_version(package)
+      package_path = Rails.root.join('package.json')
+      package_dependencies = JSON.parse(package_path.read)['dependencies']
+
+      raise "Package #{package} not found in #{package_path}" unless package_dependencies.key?(package)
+
+      package_dependencies[package]
+    end
+
+    def remote_specifier(name, version, slash: false, dep_alias: nil)
+      base = "https://esm.sh/#{name}@#{version}"
+
+      query = { alias: dep_alias }.compact
+
+      return "#{base}&#{query.to_query}/" if slash
+
+      "#{base}?#{query.to_query}"
+    end
+  end
+
+  class << self
+    def config
+      @config ||= Configuration.new
+    end
+
+    def configure
+      yield config
+    end
+
+    def to_json(*_args)
+      all_imports = config.imports.to_h { [_1[:name], _1[:remote]] }
+      all_components = config.modules.index_with do |mod|
+        module_specifier(mod)
+      end
+
+      JSON.pretty_generate({ imports: { **all_imports, **all_components } })
+    end
+
+    def module_specifier(name)
+      return "/assets/javascript/#{name}.js" unless Rails.env.production?
+
+      ActionController::Base.helpers.javascript_path("javascript/#{name}")
+    end
+  end
+end
+`
+  },
+]}
+/>
+
+<Aside>
+<h2 slot="header">
+  What's going on here?
+</h2>
+
+  <slot>
+    There are three main things I want to highlight above:
+    1. `config/initializers/import_map.rb` contains a declaration of all the dependencies I want to be included in my importmap. Any remote dependencies are resolved using esm.sh with the version from `package.json`.
+    1. In my application layout, I added an `importmap` script in the `head` element which renders the JSON output of `ImportMap`.
+    1. The `ImportMap` class handles declaring the resolutions for external dependencies, as well as resolving local dependencies from Sprockets.
+
+    Why not use `importmap-rails`? Well, it famously does not, <a href={"https://github.com/rails/importmap-rails/issues/124#issuecomment-1113969386"} target={"_blank"}>nor will not</a>, support Typescript. Luckily, it's not that hard to roll yourself using sprockets and esbuild.
+  </slot>
+</Aside>
 
 ### Typescript
+
+I love Typescript, I use it whenever I can. I'll again save the long-winded extolling of values for another post.
+One thing to note, however, is that all imports of local modules must be non-relative. The reason for this is that modules declared in the import map are all
+declared as non-relative. Using relative paths in your source code would force you to add a distinct importmap entry for every possible relative path to a module.
+Since the browser would treat all of these as different files from a caching perspective, a better approach is to just ensure that you're always using the same import for a module
+that would appear in the import map.
+
+Using non-relative paths requires some config changes in Typescript in order for the compiler to successfully type-check your code.
+
+For example:
+<CodeBlock
+tabs={[
+  {
+    filename: "app/javascript/components/PriceLevel.tsx",
+    language: "typescript",
+    code: `
+import type { VNode } from 'preact';
+
+// 💡"utilities/dollarsigns" is a local module referenced
+// with a non-relative path.
+// We need to tell typescript how to
+// resolve this non-relative path
+import dollarSigns from "utilities/dollarsigns";
+
+export default function PriceLevel(props: { count: number }): VNode {
+  return (
+    <p>Price: {dollarSigns(count)}</p>
+  );
+}
+    `
+  },
+  {
+    filename: "tsconfig.json",
+    language: "json",
+    code: `
+{
+  "compilerOptions": {
+    // ...
+    // paths helps typescript map a non-relative path to a relative one
+    "paths": {
+      "utilities/*": ["./app/javascript/utilities/*"],
+    }
+  },
+}
+    `
+  },
+  {
+    filename: "import_map.json",
+    language: "json",
+    code: `
+{
+  "imports": {
+    // ...
+    "utilities/dollarsigns": "/assets/javascript/dollarsigns-abcd0123.js"
+  }
+}
+    `
+  }
+  ]}
+/>
+
+### esbuild
+
+
+
+
+### ES Module CDN: esm.sh
+
+Using CDNs to deliver ES Modules to the browser has a bunch of advantages:
+
+1. Server load: you don't waste your own CPU cycles delivering someone else's code.
+1. Latency: CDN edge nodes are typically going to be a lot closer to your users than your server is.
+1. They're totally free to use
+
+There are bunch of really great ESModule CDNs out there, but I use [esm.sh](https://esm.sh).
+esm.sh has some really cool features, like the ability to alias dependencies to support things like <a href="https://esm.sh/#docs" target="_blank">preact/compat</a>, and
+has generally been very solid for my needs.
 
 <Footnotes />

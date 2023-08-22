@@ -8,7 +8,7 @@
   }
 
   h1.page-title {
-    @apply text-5xl lg:text-8xl font-bold;
+    @apply text-5xl font-bold lg:text-8xl;
   }
 
   .min-h-available {

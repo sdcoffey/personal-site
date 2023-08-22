@@ -8,14 +8,7 @@ draft: true
 
 import steve from "../../assets/ttc.jpeg";
 import { Image } from "astro:assets";
-import { HeaderLink, CodeBlock } from "../../components";
-
-<CodeBlock
-  code={`
-type Example = { a: number };
-`.trim()}
-  lang="typescript"
-/>
+import CodeBlock from "../../components/CodeBlock.astro";
 
 MDX is a special flavor of Markdown that supports embedded JavaScript & JSX syntax. This unlocks the ability to [mix JavaScript and UI Components into your Markdown content](https://docs.astro.build/en/guides/markdown-content/#mdx-features) for things like interactive charts or alerts.
 
@@ -23,20 +16,41 @@ If you have existing content authored in MDX, this integration will hopefully ma
 
 ## Example
 
-<Image
-  src={steve}
-  alt="Photo of Steve"
-  format="webp"
-  quality="med"
-  class="h-48 w-full rounded object-cover object-center"
-/>
+<CodeBlock
+  tabs={[
+    {
+      language: "js",
+      filename:"example.js",
+      code: `
+const x = 1;
+
+class Vert extends Component {
+}
+`
+    },
+    {
+      language: "rb",
+      filename:"example.rb",
+      code: `
+x = 1
+`
+    }
+    ]} />
+
+
+<figure>
+  <Image
+    src={steve}
+    alt="Photo of Steve"
+    format="webp"
+    quality="med"
+    class="h-64"
+  />
+  <figcaption>some caption</figcaption>
+</figure>
 
 Here is how you import and use a UI component inside of MDX.
 When you open this page in the browser, you should see the clickable button below.
-
-<HeaderLink href="#" onclick="alert('clicked!')">
-  Embedded component in MDX
-</HeaderLink>
 
 ## More Links
 

@@ -1,21 +1,15 @@
 import mdx from "@astrojs/mdx";
-import remarkToc from "remark-toc";
 import sitemap from "@astrojs/sitemap";
+import tailwind from "@astrojs/tailwind";
 import { defineConfig } from "astro/config";
 
-import tailwind from "@astrojs/tailwind";
+import preact from "@astrojs/preact";
 
 // https://astro.build/config
 export default defineConfig({
   site: "https://stevendcoffey.com",
   experimental: {
     assets: true,
-  },
-  markdown: {
-    draft: true,
-    remarkPlugins: [
-        [remarkToc, { heading: "In this post" }],
-    ],
   },
   integrations: [
     mdx({

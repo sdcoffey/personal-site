@@ -2,47 +2,88 @@
 import { Code } from "astro/components";
 
 type Props = {
-  code: string;
-  lang: string;
+  tabs: Array<{ filename: string; language: string; code: string; class?: string }>;
 };
 
-const { code, lang } = Astro.props;
+const { tabs } = Astro.props;
 ---
 
-<div class="relative my-6 rounded-lg bg-slate-800 p-4">
-  <button
-    data-code-copy-button
-    data-code-copy-content={code}
-    class="absolute right-2 top-2 h-10 w-10 rounded border border-slate-700 p-2 transition hover:bg-slate-700 active:bg-slate-900 active:shadow-inner"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="1.5"
-      stroke="currentColor"
-      class="w-full text-slate-400"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 01-2.25 2.25H6.75A2.25 2.25 0 014.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 011.927-.184"
-      ></path>
-    </svg>
-  </button>
-  <Code code={code.trim()} lang={lang} />
+<div class="code-tabs-container">
+  <div class="scrollbar-hidden flex max-w-full flex-row overflow-x-scroll">
+    {
+      tabs.map((tab) => (
+        <div data-filename={tab.filename} class="code-tabs-container__tab">
+          {tab.filename}
+        </div>
+      ))
+    }
+  </div>
+  <div>
+    {
+      tabs.map((tab) => (
+        <div class:list={["code-tabs-container__code-container", tab.class]} data-filename={tab.filename}>
+          <Code lang={tab.language} code={tab.code.trim()} />
+        </div>
+      ))
+    }
+  </div>
 </div>
 
-<script>
-  const copyButtons = document.querySelectorAll("[data-code-copy-button]");
-  copyButtons.forEach((b) => {
-    b.addEventListener("click", () => {
-      try {
-        const code = b.attributes["data-code-copy-content"].value;
-        navigator.clipboard.writeText(code.trim());
-      } catch (e) {
-        console.error(e);
+<style is:global>
+  .code-tabs-container {
+    @apply my-8;
+    @apply flex flex-col;
+
+    &__code-container {
+      &--hidden {
+        @apply hidden;
       }
+
+      pre.astro-code {
+        @apply !my-0 !rounded-t-none;
+      }
+    }
+
+    &__tab {
+      @apply rounded-t-lg bg-slate-500 px-4 py-2 font-mono text-xs text-slate-300;
+      @apply hover:cursor-pointer;
+
+      &--selected {
+        @apply bg-slate-800 text-slate-100 shadow;
+      }
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll(".code-tabs-container").forEach((container) => {
+    const tabs = container.querySelectorAll(".code-tabs-container__tab");
+
+    function selectTab(name: string): void {
+      tabs.forEach((tab) => {
+        if (tab.dataset.filename !== name) {
+          tab.classList.remove("code-tabs-container__tab--selected");
+        } else {
+          tab.classList.add("code-tabs-container__tab--selected");
+        }
+      });
+
+      container.querySelectorAll(".code-tabs-container__code-container").forEach((codeContainer) => {
+        if (codeContainer.dataset.filename !== name) {
+          codeContainer.classList.add("code-tabs-container__code-container--hidden");
+        } else {
+          codeContainer.classList.remove("code-tabs-container__code-container--hidden");
+        }
+      });
+    }
+
+    tabs.forEach((element) => {
+      element.addEventListener("click", () => {
+        const filename = element.dataset.filename;
+        selectTab(filename);
+      });
     });
+
+    selectTab(tabs[0].dataset.filename);
   });
 </script>

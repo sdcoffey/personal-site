@@ -30,6 +30,6 @@ module.exports = {
           "scrollbar-width": "none",
         },
       });
-    }
+    },
   ],
 };
