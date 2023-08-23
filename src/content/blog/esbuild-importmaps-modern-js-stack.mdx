@@ -840,6 +840,31 @@ esm.sh has some really cool features, like the ability to alias dependencies to 
 has generally been very solid for my needs.
 
 
+### Server-side rendering
+
+Rails in many ways is the archetypal MVC framework. Server rendering is what it's designed for and what it's really, really good at.
+That being said, if you're using a client-rendered framework on top of Rails to sprinkle in bits of interactivity, you can end up with some lag in
+interactivity while your React/Preact components mount. This is a topic for a entirely separate blog post so I'll cover my setup
+and a few learnings briefly.
+
+1. I try really hard **not** to have any fully client-rendered pages, especially my landing page. It's both bad for SEO, being hard
+for some search engines to crawl, and it adds a ton of wait time for the page to become interactive. We try to sprinkle in
+rich components among server-rendered markup.
+1. Use a separate Node server to SSR your Preact components. I'll write another blog post about this sometime, but essence
+what we do is use use a [ViewComponent](https://viewcomponent.org/) to call our Preact SSR server during rendering, which returns HTML that's
+sent back to the client, along with some client-side js to hydrate the component if needed.
+1. If you can't do the above, try not to use any fully client-rendered components above the fold on your landing page.
+
+
+<Aside>
+  <h2 slot={"header"}>Next, Nuxt, and the rest</h2>
+
+  I don't have too much experience with these. If they do all of these thing right out of the box, great! Let me know and I'll add an addendum.
+  
+  This website was built using [Astro](https://astro.build) which also evangelizes the reactivity-islands approach and does handle all of these ES Module niceties for you.
+</Aside>
+
+
 ## The net-net
 
 Page performance actually matters, and not just because performance optimzation feels technically satisfying. Page performance
@@ -847,10 +872,10 @@ has real impacts on people and businesses.
 
 Philosophically, life is short and it's kinda sad that we'll spend a nontrival
 percentage of our lives just waiting for websites to load. Less philosophically, page performance has impacts on all businesses.
-Better page speeds have impacts across SEO<Footnote text="Google blog: Speed is now a landing page factor for Google Search and Ads" href="https://developer.chrome.com/blog/search-ads-speed/"/>,
-conversion<Footnote text="Elise Dopson: Website speed optimization" href="https://www.shopify.com/enterprise/site-performance-page-speed-ecommerce"/>,
-and engagement<Footnote text="Pingdom blog: Does page load time really affect bounce rate?" href="https://www.pingdom.com/blog/page-load-time-really-affect-bounce-rate/" />,
-all of which can result in fewer customers and money when not optimized.
+Better page speeds have impacts across SEO,<Footnote text="Google blog: Speed is now a landing page factor for Google Search and Ads" href="https://developer.chrome.com/blog/search-ads-speed/"/>
+ conversion,<Footnote text="Elise Dopson: Website speed optimization" href="https://www.shopify.com/enterprise/site-performance-page-speed-eco,mmerce"/>
+and engagement,<Footnote text="Pingdom blog: Does page load time really affect bounce rate?" href="https://www.pingdom.com/blog/page-load-time-really-affect-bounce-rate/" />
+all of which can result in fewer customers and less money when not optimized.
 
 My point, simply, is this: don't shoot yourself in the foot. A modern stack with modern, simple tooling can deliver a
 meaningful bump in pageload performance with very little lift on your part.
