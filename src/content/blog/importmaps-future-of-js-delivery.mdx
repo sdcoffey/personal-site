@@ -1,21 +1,22 @@
 ---
-title: "On ImportMaps and the future of JS delivery"
-description: A look at import maps and why you should be adopting them in your next project
+title: "ES Modules + Importmaps: a modern JS stack"
+description: ES Modules and importmaps are the most modern and performant way to run and distribute Javascript in the browser
 pubDate: 2023-08-15
-heroImage: ../../assets/placeholder-hero.jpg
+heroImage: ../../assets/honeycomb.jpg
 ---
 
+import tlsHandshake from '../../assets/tls-ssl-handshake.png';
 import scriptingWheel from "../../assets/scripting-wheel.png";
 import { Image } from "astro:assets";
 import { Aside, CodeBlock, Footnote, Footnotes } from "../../components";
 
 ## It's time to give up the bundler!
 
-I recently stopped bundling my javascript in my rails setup, and opted for a more straightforward approach leveraging **ES Modules** and **importmaps**
-to load and run javascript in the browser. I'm convinced this is the way to go, and I wanted to write a brief explainer on ESM + importmaps and why you
+I recently stopped bundling my JS in my Rails setup, and opted for a more straightforward approach leveraging **ES Modules** and **importmaps**
+to load and run Javascript in the browser. I'm convinced this is the way to go, and I wanted to write a brief explainer on ESM + importmaps and why you
 should think about ditching the bundler in your next project.
 
-In this post, I want to cover briefly what ES Modules are, what they can replace, as well as the historical reasons why we've used bundlers in the past, and why
+In this post, I want to cover briefly what ES Modules are, what they can replace, the historical reasons why we've used bundlers in the past, and why
 continuing to do so might be hurting your page performance.
 
 ## What are Javascript Modules?
@@ -25,7 +26,7 @@ Concretely, it's just a file that declares exports to be available in another fi
 
 There are two main module systems:
 
-- **CommonJS** (which you'll be familiar with if you've ever written javascript for Node)
+- **CommonJS** (which you'll be familiar with if you've ever written Javascript for Node)
 - **ES Modules** (now supported in the browser and used in Deno)
 
 Here's the same module written for both CJS and ESM:
@@ -44,7 +45,7 @@ module.exports = addPi;
 In this example, when this module is loaded, Node would go looking for `lodash` in our `node_modules/` folder, and make your function, `addPi`, available as a default export to any other modules requiring it.
 
 ```js
-// module.esm
+// module.mjs
 import { merge } from "https://esm.sh/lodash@4.17.21";
 
 export default function addPi(target) {
@@ -54,12 +55,12 @@ export default function addPi(target) {
 
 Here, we're able to specify that `lodash` should be imported from a remote URL, in this case the CDN esm.sh.
 
-CommonJS modules have **never been supported in the browser**, while ESM is now supported by Node,
+CommonJS modules have **never been supported in the browser**, while ESM is now supported by Node<Footnote text="ES Modules are supported by Node, but some things, like remote loading demonstrated here, do not work out of the box."/>
 the vast majority of browsers<Footnote text="Can I use ESM?" href="https://caniuse.com/?search=ESM"/>, and alternative JS runtimes like [Deno](https://deno.land) and [Bun](https://bun.sh).
 
 ## What's an importmap?
 
-Importmaps are a way to tell the browser where to find javascript (specifically, **ES Modules**) that are included via an `import` from another module.
+Importmaps are a way to tell the browser where to find Javascript (specifically, **ES Modules**) that are included via an `import` from another module.
 
 You might have spotted the immediate problem with the ES Module above, which is one of **dependency management**.
 
@@ -85,12 +86,12 @@ Here's the same script above rewritten for the browser, using importmaps.
       }
     }
   </script>
-  <script type="module" src="/module.esm"></script>
+  <script type="module" src="/module.mjs"></script>
 </head>
 ```
 
 ```js
-// module.esm
+// module.mjs
 import { merge } from "lodash";
 
 export default function addPi(target) {
@@ -102,25 +103,26 @@ export default function addPi(target) {
     <summary>What's going on here?</summary>
 
     In our html doc, we've declared two script tags, one with `type="importmap"`, and one with `type="module"`.
-    When the browser parses the second script tag, it will download and execute `module.esm`.
+    When the browser parses the second script tag, it will download and execute `module.mjs`.
 
-    As it begins to parse `module.esm`, the first statement the interpreter will come across is an import of the `merge` function from `lodash`.
+    As it begins to parse `module.mjs`, the first statement the interpreter will come across is an import of the `merge` function from `lodash`.
     Because `lodash` is not an absolute import (starting with `/`), it will refer to the importmap to resolve the module.
 
-    Having resolved `lodash` to `https://esm.sh/lodash@4.17.21`, it will fetch the module, and continue executing `module.esm`.
+    Having resolved `lodash` to `https://esm.sh/lodash@4.17.21`, it will fetch the module, and continue executing `module.mjs`.
 
 </details>
 
 ## Why were we bundling again?
 
-This sounds great right? So why were we ever bundling our javascript?
-
-In my estimation there are three historical reasons, and two modern reasons for why we bundle our javascript.
+In my estimation there are three historical reasons, and two modern reasons for why we bundle our Javascript.
 
 <Aside>
   <h2 slot="header">Wait--what's bundling?</h2>
-    Tools like Webpack and Rollup take your javascript and all of its dependencies (like React or lodash), as well as
+
+  <slot>
+    Tools like Webpack and Rollup take your Javascript and all of its dependencies (like React or lodash), as well as
     normalized references to external assets (like images) and squish them into one big file, called a "bundle".
+  </slot>
 </Aside>
 
 ### Historical reason 1: the global namespace
@@ -238,19 +240,37 @@ Unfortunately, this code is **not** going to run in the browser as is, since, as
 ### Historical reason 2: HTTP/1.x
 
 In ancient times (pre-2015), browsers supported only the first major version of the HTTP protocol.
-Without getting too into the weeds on the nuances of HTTP, suffice it to say that in HTTP/1.x, the relationship between requests and the underlying TCP connection is 1:1. That is, only one resource may be loaded for each TCP connection.
+Without getting too into the weeds on the nuances of HTTP, suffice it to say that in HTTP/1.x,
+the relationship between requests and the underlying TCP connection is 1:1. That is, only one resource may be loaded for each TCP connection.
 
-The issue is that if you're using TLS (and I hope you are), the client needs to make at least two round trips before the request is made simply to establish the connection, before any bytes relevant to your application can be served.
+If you're using TLS, two roundtrips are required to perform a TLS handshake before any HTTP bytes can be transferred.
 Then, when the request is finished, you have to close this connection and start fresh on the next request.
 
-Because modern websites (even in 2015) had lots of images and custom fonts and other resources external to the HTML, the browser had to make many requests to fetch all of these resources.
-However, most browsers would only allow up to six concurrent TCP connections to a host, meaning that if you had more than six assets to fetch from your server, you had to wait for the first six to finish before requesting more.
+<figure>
+<Image
+  src={tlsHandshake}
+  format={"webp"}
+  width={1000}
+  height={571}
+  alt={"A TLS 1.2 handshaek"}
+/>
+  <figcaption>A TLS 1.2 handshake. Blue is the TCP handshake, yellow is the TLS handshake. Graphic courtesy of the [Cloudflare Blog](https://www.cloudflare.com/learning/ssl/what-happens-in-a-tls-handshake/)</figcaption>
+</figure>
 
-Because we're doing a new TLS handshake for every request, as highlighted above, that's at least 2x more server roundtrips for every additional resource!
+<Aside>
+  <h2 slot="header">TLS 1.3</h2>
+  <slot>
+    Before I get any neckbeards in my DMs letting me know that fewer roundtrips are required to perform a handshake with TLS 1.3, let me say:
+    while that is true, TLS1.3 wasn't released until 2018, well after many websites were already using HTTP/2.
+  </slot>
+</Aside>
 
-** Add an illustration **
+Modern websites (even in 2015) have lots of images and custom fonts and other resources external to the HTML.
+Because HTTP/1.x forces the browser to close the underlying connection after every HTTP request, you incur 2x more server
+roundtrips for every additional resource.
 
-Bundling Javascript was a convenient way to reduce the number of requests needed to fetch all of your scripts. Since all your javascript is now squished into one big file, you've eliminated potentially dozens of server roundtrips.
+Bundling Javascript was a convenient way to reduce the number of requests needed to fetch all of your scripts.
+Since all your Javascript is now squished into one big file, you've eliminated potentially dozens of server roundtrips.
 
 #### HTTP/2
 
@@ -367,20 +387,18 @@ which serve transparently as both transpiler and bundler.
 Later, we'll cover my preferred setup, using esbuild to **transpile only**, which allows us to use these great client-side
 frameworks without bundling, and get a lot of free pageload performance as a result.
 
-## Why not bundle?
+## Bundling can be a performance detractor
 
 As we've covered, I think there are many good historical reasons why we've bundled our JS in the past, but I think there are some pretty
 strong reasons to stop bundling JS code.
 
-### Pageload performance
-
 As we covered [above](#historical-reason-2-http1x), with the advent of HTTP/2, serving multiple assets from the same server is much more efficient than it used to be.
-Unless you're serving literally hundreds of js files to your client, it's probably not worth bundling them together. We get a huge bump in pageload performance for free just by using HTTP/2
+Unless you're serving literally hundreds of JS files to your client, it's probably not worth bundling them together. We get a huge bump in pageload performance for free just by using HTTP/2
 to efficiently serve resources over one TCP connection.
 
 There are actually some explicit performance benefits to be gained by serving individual ES Modules, the first being:
 
-#### Cacheability
+### Cacheability
 
 Browsers aggressively cache assets from pages you visit. If you've ever cleared your browser cache, you know that it can balloon in size, often into the gigabytes.
 
@@ -424,7 +442,7 @@ In the above example, my change of heart with respect to the `function` keyword 
 When you serve many small ES modules, the browser only needs to re-download those that have changed since it last saw your webpage.
 Because you're very unlikely to touch every file every time you push a new update, you'll end up serving very little incremental JS to the browser.
 
-#### JS Parsing
+### JS Parsing
 
 We've talked a lot about downloading as a major performance factor for JS, but what the browser does once the JS is
 downloaded can have a bigger drag on performance.
@@ -458,9 +476,12 @@ amount of unused JS on your page that the browser has to parse before your page 
 
 ## My setup
 
+I want to ~flex~ share my setup using Rails, esbuild, Typescript and Preact to get dead-simple ES Module support.
+
 ### Rails Sprockets + ImportMaps
 
-I use Rails and Sprockets to build 99% of my web projects. I'll save why for another post, but I have a very simple setup for building importmaps in Rails.
+I use Rails and Sprockets to build 99% of my web projects. I'll save why for another post, but I have a very simple setup
+for building importmaps in Rails.
 
 <CodeBlock
 tabs={[
@@ -621,18 +642,16 @@ end
 ]}
 />
 
+
+There are three main things I want to highlight above:
+  1. `config/initializers/import_map.rb` contains a declaration of all the dependencies I want to be included in my importmap. Any remote dependencies are resolved using esm.sh with the version from `package.json`.
+1. In my application layout, I added an `importmap` script in the `head` element which renders the JSON output of `ImportMap`.
+1. The `ImportMap` class handles declaring the resolutions for external dependencies, as well as resolving local dependencies from Sprockets.
+
 <Aside>
-<h2 slot="header">
-  What's going on here?
-</h2>
-
+  <h2 slot="header">Why not use `importmap-rails`?</h2>
   <slot>
-    There are three main things I want to highlight above:
-    1. `config/initializers/import_map.rb` contains a declaration of all the dependencies I want to be included in my importmap. Any remote dependencies are resolved using esm.sh with the version from `package.json`.
-    1. In my application layout, I added an `importmap` script in the `head` element which renders the JSON output of `ImportMap`.
-    1. The `ImportMap` class handles declaring the resolutions for external dependencies, as well as resolving local dependencies from Sprockets.
-
-    Why not use `importmap-rails`? Well, it famously does not, [nor will not](https://github.com/rails/importmap-rails/issues/124#issuecomment-1113969386), support Typescript. Luckily, it's not that hard to roll yourself using sprockets and esbuild.
+    Well, it famously does not, [nor will not](https://github.com/rails/importmap-rails/issues/124#issuecomment-1113969386), support Typescript. Luckily, it's not that hard to roll yourself using sprockets and esbuild.
   </slot>
 </Aside>
 
@@ -655,10 +674,11 @@ tabs={[
     code: `
 import type { VNode } from 'preact';
 
-// 💡"utilities/dollarsigns" is a local module referenced
-// with a non-relative path.
-// We need to tell typescript how to
-// resolve this non-relative path
+/**
+ * 'utilities/dollarsigns' is a local module referenced
+ * with a non-relative path.
+ * We need to tell typescript how to resolve this non-relative path
+ */
 import dollarSigns from "utilities/dollarsigns";
 
 export default function PriceLevel(props: { count: number }): VNode {
@@ -700,19 +720,133 @@ export default function PriceLevel(props: { count: number }): VNode {
 
 ### esbuild
 
-I like to keep my builld system really simple
+[esbuild](https://esbuild.github.io/) is great if you're like me and prefer very simple, straightforward tools. By those yardsticks, esbuild is fantastic: fast, predictable,
+and requires limited configuration out of the box. It's also set up perfectly to transpile your code for ES Modules.
+
+I have a pretty straightforward esbuild setup that globs all of my JS entrypoints and outputs them into a folder
+where they can be picked up by Sprockets:
+
+<CodeBlock
+  tabs={[
+{
+  language: "js",
+  filename: "esbuild.mjs",
+  code:`
+import * as esbuild from 'esbuild'
+import { glob } from "glob";
+
+(async () => {
+  // Ignore all test files
+  const ignore = {
+    ignored: (p) => /^.*\.test\.tsx?$/.test(p.name),
+  }
+
+  let entryPoints = await glob("./app/javascript/**/*.*", {
+    ignore
+  });
+
+  // also transpile any js associated with a ViewComponent
+  entryPoints = entryPoints.concat(await glob("./app/components/**/*.ts", { ignore }));
+
+  const buildContext = await esbuild.build({
+    entryPoints,
+    bundle: false,
+    format: "esm", // 👈 this is the key config
+    outdir: "app/assets/builds", // sprockets will pick up transpiled assets from here
+    publicPath: "assets",
+    loader: {
+      ".svg": "dataurl",
+    },
+  });
+})();
+  `
+}
+]}/>
+
+With this config, esbuild is doing _almost nothing_ to my source code. With my setup (Typescript and Preact), it's just
+stripping types and transpiling JSX. If I weren't using either Typscript or Preact, I wouldn't need this step at all.
+
+<details>
+  <summary>Show me</summary>
+  Here's a simple preact component from one of my projects:
+
+  ```typescript
+  // IconButton.tsx
+
+  import cx from "clsx";
+  import { VNode } from "preact";
+
+  type Props = {
+    class?: string;
+    Icon: VNode;
+    onClick: () => void;
+  };
+
+  export default function IconButton(props: Props): VNode {
+    return (
+      <button
+        onClick={props.onClick}
+        class={cx(
+          "flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition hover:border-slate-400 hover:shadow",
+          props.class
+        )}
+      >
+        {props.Icon}
+      </button>
+    );
+  }
+  ```
+
+which will get transpiled to:
+
+```js
+import { jsx } from "preact/jsx-runtime";
+import cx from "clsx";
+function IconButton(props) {
+  return /* @__PURE__ */ jsx(
+    "button",
+    {
+      onClick: props.onClick,
+      class: cx(
+        "flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition hover:border-slate-400 hover:shadow",
+        props.class
+      ),
+      children: props.Icon
+    }
+  );
+}
+export {
+  IconButton as default
+};
+```
+</details>
 
 
 ### ES Module CDN: esm.sh
 
 Using CDNs to deliver ES Modules to the browser has a bunch of advantages:
 
-1. Server load: you don't waste your own CPU cycles delivering someone else's code.
-1. Latency: CDN edge nodes are typically going to be a lot closer to your users than your server is.
-1. They're totally free to use
+1. **No marginal server load**: don't waste your own CPU cycles delivering someone else's code.
+1. **Reduced latency**: CDN edge nodes are typically going to be a lot closer to your users than your server is.
+1. **No marginal cost**: They're totally free to use.
 
-There are bunch of really great ESModule CDNs out there, but I use [esm.sh](https://esm.sh).
+There are bunch of really great ES Module CDNs out there, but I use [esm.sh](https://esm.sh).
 esm.sh has some really cool features, like the ability to alias dependencies to support things like [preact/compat](https://esm.sh/#docs), and
 has generally been very solid for my needs.
 
-<Footnotes />
+
+## The net-net
+
+Page performance actually matters, and not just because performance optimzation feels technically satisfying. Page performance
+has real impacts on people and businesses.
+
+Philosophically, life is short and it's kinda sad that we'll spend a nontrival
+percentage of our lives just waiting for websites to load. Less philosophically, page performance has impacts on all businesses.
+Better page speeds have impacts across SEO<Footnote text="Google blog: Speed is now a landing page factor for Google Search and Ads" href="https://developer.chrome.com/blog/search-ads-speed/"/>,
+conversion<Footnote text="Elise Dopson: Website speed optimization" href="https://www.shopify.com/enterprise/site-performance-page-speed-ecommerce"/>,
+and engagement<Footnote text="Pingdom blog: Does page load time really affect bounce rate?" href="https://www.pingdom.com/blog/page-load-time-really-affect-bounce-rate/" />,
+all of which can result in fewer customers and money when not optimized.
+
+My point, simply is this: don't shoot yourself in the foot. A modern stack with modern, simple tooling can deliver a
+meaningful bump in pageload performance with very little lift on your part.
+

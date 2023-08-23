@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
-import { FormattedDate } from "../components";
+import { Footnotes, Howler, FormattedDate } from "../components";
 
 import MainLayout from "../layouts/MainLayout.astro";
 
@@ -34,6 +34,8 @@ const filteredHeaders = headings.filter(({ depth }) => depth < 4);
     {!heroImage && <hr />}
     <div class="article-content">
       <slot />
+      <Howler />
+      <Footnotes />
     </div>
 
     {
@@ -82,10 +84,10 @@ const filteredHeaders = headings.filter(({ depth }) => depth < 4);
 
     &--intersection,
     &:hover {
-      @apply bg-emerald-100 text-emerald-700 underline transition;
+      @apply bg-blue-100 text-blue-800 underline transition;
 
       &:before {
-        @apply !bg-emerald-400;
+        @apply !bg-blue-600;
       }
     }
 
@@ -109,6 +111,7 @@ const filteredHeaders = headings.filter(({ depth }) => depth < 4);
       }
       summary {
         @apply text-base font-semibold text-slate-700;
+        @apply cursor-pointer;
       }
     }
 
@@ -154,7 +157,7 @@ const filteredHeaders = headings.filter(({ depth }) => depth < 4);
 
     .scrollable-code {
       pre {
-        @apply max-h-[700px] overflow-y-scroll;
+        @apply max-h-[60vh] overflow-y-scroll lg:max-h-[700px];
       }
     }
   }
