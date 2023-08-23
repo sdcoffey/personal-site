@@ -17,7 +17,7 @@ const posts = (await getCollection("blog"))
       {
         posts.map((post) => (
           <li class="flex flex-col gap-px">
-            <a class="hover:cursor-pointer" href={`/blog/${post.slug}/`}>
+            <a href={`/blog/${post.slug}/`}>
               <p class="text-lg font-semibold">{post.data.title}</p>
               <p class="line-clamp-2 text-sm font-light">{post.data.description}</p>
               <div class="flex items-center gap-3">

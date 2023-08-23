@@ -1,0 +1,18 @@
+---
+const external = Astro.props.href.includes("http");
+---
+
+<a
+  {...Astro.props}
+  class:list={[Astro.props.class, { external }]}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noopener noreferrer" : undefined}><slot /></a
+>
+
+<style>
+  .external {
+    &:after {
+      content: "[↗]";
+    }
+  }
+</style>

@@ -3,7 +3,6 @@ title: "On ImportMaps and the future of JS delivery"
 description: A look at import maps and why you should be adopting them in your next project
 pubDate: 2023-08-15
 heroImage: ../../assets/placeholder-hero.jpg
-draft: true
 ---
 
 import scriptingWheel from "../../assets/scripting-wheel.png";
@@ -56,7 +55,7 @@ export default function addPi(target) {
 Here, we're able to specify that `lodash` should be imported from a remote URL, in this case the CDN esm.sh.
 
 CommonJS modules have **never been supported in the browser**, while ESM is now supported by Node,
-the vast majority of browsers<Footnote text="Can I use ESM?" href="https://caniuse.com/?search=ESM"/>, and alternative JS runtimes like <a href="https://deno.land/" target="_blank">Deno</a> and <a href="https://bun.sh/" target="_blank">Bun</a>.
+the vast majority of browsers<Footnote text="Can I use ESM?" href="https://caniuse.com/?search=ESM"/>, and alternative JS runtimes like [Deno](https://deno.land) and [Bun](https://bun.sh).
 
 ## What's an importmap?
 
@@ -633,7 +632,7 @@ end
     1. In my application layout, I added an `importmap` script in the `head` element which renders the JSON output of `ImportMap`.
     1. The `ImportMap` class handles declaring the resolutions for external dependencies, as well as resolving local dependencies from Sprockets.
 
-    Why not use `importmap-rails`? Well, it famously does not, <a href={"https://github.com/rails/importmap-rails/issues/124#issuecomment-1113969386"} target={"_blank"}>nor will not</a>, support Typescript. Luckily, it's not that hard to roll yourself using sprockets and esbuild.
+    Why not use `importmap-rails`? Well, it famously does not, [nor will not](https://github.com/rails/importmap-rails/issues/124#issuecomment-1113969386), support Typescript. Luckily, it's not that hard to roll yourself using sprockets and esbuild.
   </slot>
 </Aside>
 
@@ -713,7 +712,7 @@ Using CDNs to deliver ES Modules to the browser has a bunch of advantages:
 1. They're totally free to use
 
 There are bunch of really great ESModule CDNs out there, but I use [esm.sh](https://esm.sh).
-esm.sh has some really cool features, like the ability to alias dependencies to support things like <a href="https://esm.sh/#docs" target="_blank">preact/compat</a>, and
+esm.sh has some really cool features, like the ability to alias dependencies to support things like [preact/compat](https://esm.sh/#docs), and
 has generally been very solid for my needs.
 
 <Footnotes />
