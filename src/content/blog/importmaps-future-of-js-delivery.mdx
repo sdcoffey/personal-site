@@ -56,6 +56,7 @@ export default function addPi(target) {
 
 Here, we're able to specify that `lodash` should be imported from a remote URL, in this case the CDN esm.sh.
 
+### Browser support
 CommonJS modules have **never been supported in the browser**, while ESM is now supported by Node<Footnote text="ES Modules are supported by Node, but some things, like remote loading demonstrated here, do not work out of the box."/>
 the vast majority of browsers<Footnote text="Can I use ESM?" href="https://caniuse.com/?search=ESM"/>, and alternative JS runtimes like [Deno](https://deno.land) and [Bun](https://bun.sh).
 
@@ -107,11 +108,14 @@ export default function addPi(target) {
     When the browser parses the second script tag, it will download and execute `module.mjs`.
 
     As it begins to parse `module.mjs`, the first statement the interpreter will come across is an import of the `merge` function from `lodash`.
-    Because `lodash` is not an absolute import (starting with `/`), it will refer to the importmap to resolve the module.
+    Because `lodash` is not an absolute or relative import, it will refer to the importmap to resolve the module.
 
     Having resolved `lodash` to `https://esm.sh/lodash@4.17.21`, it will fetch the module, and continue executing `module.mjs`.
-
 </details>
+
+### Browser support
+Importmaps are supported by only 85%<Footnote text="Can I use import maps?" href="https://caniuse.com/import-maps"/> of browsers, but there's [a nice polyfill](https://github.com/guybedford/es-module-shims)
+that you can use to bump that up into the 90s if you care to do so.
 
 ## Why were we bundling again?
 
@@ -262,13 +266,13 @@ Then, when the request is finished, you have to close this connection and start 
   <h2 slot="header">TLS 1.3</h2>
   <slot>
     Before I get any neckbeards in my DMs letting me know that fewer roundtrips are required to perform a handshake with TLS 1.3, let me say:
-    while that is true, TLS1.3 wasn't released until 2018, well after many websites were already using HTTP/2.
+    while that is true, TLS 1.3 wasn't released until 2018, well after many websites were already using HTTP/2.
   </slot>
 </Aside>
 
 Modern websites (even in 2015) have lots of images and custom fonts and other resources external to the HTML.
-Because HTTP/1.x forces the browser to close the underlying connection after every HTTP request, you incur 2x more server
-roundtrips for every additional resource.
+Because HTTP/1.x forces the browser to close the underlying connection after every HTTP request, you incur **2x more server
+roundtrips for every additional resource.**
 
 Bundling Javascript was a convenient way to reduce the number of requests needed to fetch all of your scripts.
 Since all your Javascript is now squished into one big file, you've eliminated potentially dozens of server roundtrips.
@@ -277,7 +281,7 @@ Since all your Javascript is now squished into one big file, you've eliminated p
 
 With HTTP/2, browsers may _re-use_ TCP connections to the same host, and servers on the other end may even eagerly push resources to the client before they're requested, greatly increasing pageload performance.
 
-HTTP/2 is now supported by 96%<Footnote href="https://caniuse.com/?search=http%2F2" text="Can I use HTTP/2?" /> of browsers.
+HTTP/2 is now supported by 96%<Footnote href="https://caniuse.com/?search=http%2F2" text="Can I use HTTP/2?" /> of browsers, and we even have [HTTP/3](https://www.cloudflare.com/learning/performance/what-is-http3/) on the way.
 
 ### Historical reason 3: ES6 support
 
@@ -406,7 +410,7 @@ Browsers aggressively cache assets from pages you visit. If you've ever cleared 
 So what is all this stuff? It's CSS, JS, images, fonts, and a host of other assets that webpages use to display rich content. The browser caches them so that when you visit a webpage a second time,
 you don't have to download that stuff again.
 
-Good frameworks will often rewrite the names of your assets to add a content-based `fingerprint` to the filename to help browsers know
+Good frameworks will often rewrite the names of your assets to add a content-based "fingerprint" to the filename to help browsers know
 if they've already cached some version of a file. If you change the file in any way, it gets a new fingerprint to let the browser know
 that it's a different file.
 
@@ -462,7 +466,8 @@ This can be a more expensive process than the download itself.
   <figcaption>Time spent executing a 437kb bundle on my M1 Max MBP</figcaption>
 </figure>
 
-The above figure demonstrates JS activity by category for a 437kb bundle from [factor.fyi](https://factor.fyi). The lion's share of time, **382ms** is due to "scripting"
+The above figure demonstrates JS activity by category for a 437kb bundle from [factor.fyi](https://factor.fyi)<Footnote text="I'm picking on Factor because I helped build it" />.
+The lion's share of time, **382ms** is due to "scripting"
 which is any JS activity blocking the main thread. Of this, **119ms** is attributable to parsing and compiling.
 
 Compare this with the download time of this bundle at just **75ms**.
@@ -661,8 +666,7 @@ There are three main things I want to highlight above:
 I love Typescript, I use it whenever I can. I'll again save the long-winded extolling of values for another post.
 One thing to note, however, is that all imports of local modules must be non-relative. The reason for this is that modules declared in the import map are all
 declared as non-relative. Using relative paths in your source code would force you to add a distinct importmap entry for every possible relative path to a module.
-Since the browser would treat all of these as different files from a caching perspective, a better approach is to just ensure that you're always using the same import for a module
-that would appear in the import map.
+That would be very annoying to implement so a better approach is to just ensure that you're always using the same import declaration for a module that appears in your importmap.
 
 Using non-relative paths requires some config changes in Typescript in order for the compiler to successfully type-check your code.
 
@@ -848,6 +852,6 @@ conversion<Footnote text="Elise Dopson: Website speed optimization" href="https:
 and engagement<Footnote text="Pingdom blog: Does page load time really affect bounce rate?" href="https://www.pingdom.com/blog/page-load-time-really-affect-bounce-rate/" />,
 all of which can result in fewer customers and money when not optimized.
 
-My point, simply is this: don't shoot yourself in the foot. A modern stack with modern, simple tooling can deliver a
+My point, simply, is this: don't shoot yourself in the foot. A modern stack with modern, simple tooling can deliver a
 meaningful bump in pageload performance with very little lift on your part.
 
