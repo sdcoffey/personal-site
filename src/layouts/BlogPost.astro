@@ -9,7 +9,7 @@ type Props = CollectionEntry<"blog">["data"] & {
   headings: CollectionEntry<"blog">["headings"];
 };
 
-const { title, description, pubDate, heroImage, headings } = Astro.props;
+const { title, description, pubDate, heroImage, heroImageCaption, headings } = Astro.props;
 const filteredHeaders = headings.filter(({ depth }) => depth < 4);
 ---
 
@@ -21,14 +21,21 @@ const filteredHeaders = headings.filter(({ depth }) => depth < 4);
     <FormattedDate date={pubDate} class="text-sm" />
     {
       heroImage && (
-        <Image
-          class="no-padding my-12 max-h-[400px] object-cover shadow-sm md:rounded-lg lg:max-h-[300px] lg:rounded-lg"
-          src={heroImage}
-          alt={description}
-          width={1200}
-          height={1200}
-          format="webp"
-        />
+        <figure class="my-12">
+          <Image
+            class="no-padding max-h-[400px] object-cover shadow-sm md:rounded-lg lg:max-h-[300px] lg:rounded-lg"
+            src={heroImage}
+            alt={description}
+            width={1200}
+            height={1200}
+            format="webp"
+          />
+          {heroImageCaption && (
+            <figcaption class="text-center text-sm text-slate-500">
+              <Fragment set:html={heroImageCaption} />
+            </figcaption>
+          )}
+        </figure>
       )
     }
     {!heroImage && <hr />}
