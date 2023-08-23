@@ -477,7 +477,7 @@ it takes for your page to become interactive. Moreover, the ability of popular d
 JS varies wildly.<Footnote text="Addi Osmani: Javascript Startup Optimization" href="https://web.dev/optimizing-content-efficiency-javascript-startup-optimization/#parsecompile" />
 Mobile devices, especially low-cost Android mobile phones, could expect to see parsing and compiling times 3-4x what you would get on higher-end hardware.
 
-While using ES Modules to serve your JS isn't going to make parsing faster, it provides a built-in mechanism for code-splitting, helping reduce the
+While using ES Modules isn't going to make parsing faster, it provides a built-in mechanism for code-splitting, helping reduce the
 amount of unused JS on your page that the browser has to parse before your page can become interactive.
 
 ## My setup
@@ -664,8 +664,8 @@ There are three main things I want to highlight above:
 ### Typescript
 
 I love Typescript, I use it whenever I can. I'll again save the long-winded extolling of values for another post.
-One thing to note, however, is that all imports of local modules must be non-relative. The reason for this is that modules declared in the import map are all
-declared as non-relative. Using relative paths in your source code would force you to add a distinct importmap entry for every possible relative path to a module.
+One thing to note, however, is that all imports of local modules must be non-relative.
+Using relative paths in your source code would force you to add a distinct importmap entry for every possible relative path to a module.
 That would be very annoying to implement so a better approach is to just ensure that you're always using the same import declaration for a module that appears in your importmap.
 
 Using non-relative paths requires some config changes in Typescript in order for the compiler to successfully type-check your code.
