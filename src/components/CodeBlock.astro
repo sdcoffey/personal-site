@@ -9,7 +9,9 @@ const { tabs } = Astro.props;
 ---
 
 <div class="code-tabs-container">
-  <div class="scrollbar-hidden flex max-w-full flex-row overflow-x-scroll">
+  <div
+    class="scrollbar-hidden flex max-w-full flex-row divide-x divide-slate-700 overflow-x-scroll rounded-t-lg border-b border-slate-700 bg-slate-800"
+  >
     {
       tabs.map((tab) => (
         <div data-filename={tab.filename} class="code-tabs-container__tab">
@@ -22,6 +24,9 @@ const { tabs } = Astro.props;
     {
       tabs.map((tab) => (
         <div class:list={["code-tabs-container__code-container", tab.class]} data-filename={tab.filename}>
+          <button data-code-copy-button data-code-copy-content={tab.code} class="code-tabs-container__copy-button">
+            Copy
+          </button>
           <Code lang={tab.language} code={tab.code.trim()} />
         </div>
       ))
@@ -31,10 +36,17 @@ const { tabs } = Astro.props;
 
 <style is:global>
   .code-tabs-container {
-    @apply my-8;
-    @apply flex flex-col;
+    @apply my-8 flex flex-col;
+
+    &__copy-button {
+      @apply absolute right-3 top-3 rounded border border-slate-600 bg-slate-800/20 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm;
+      @apply transition hover:cursor-pointer hover:border-slate-500 hover:bg-slate-700/20 hover:underline;
+      @apply shadow-inner active:bg-slate-800;
+    }
 
     &__code-container {
+      @apply relative;
+
       &--hidden {
         @apply hidden;
       }
@@ -45,11 +57,10 @@ const { tabs } = Astro.props;
     }
 
     &__tab {
-      @apply rounded-t-lg bg-slate-500 px-4 py-2 font-mono text-xs text-slate-300;
-      @apply hover:cursor-pointer;
+      @apply whitespace-nowrap p-1 p-3 font-mono text-xs text-slate-300;
 
       &--selected {
-        @apply bg-slate-800 text-slate-100 shadow;
+        @apply text-slate-100 underline shadow;
       }
     }
   }
@@ -85,5 +96,21 @@ const { tabs } = Astro.props;
     });
 
     selectTab(tabs[0].dataset.filename);
+
+    const copyButtons = document.querySelectorAll("[data-code-copy-button]");
+    copyButtons.forEach((b) => {
+      b.addEventListener("click", () => {
+        try {
+          const code = b.dataset.codeCopyContent;
+          navigator.clipboard.writeText(code.trim());
+          b.innerText = "Copied!";
+          setTimeout(() => {
+            b.innerText = "Copy";
+          }, 2000);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    });
   });
 </script>

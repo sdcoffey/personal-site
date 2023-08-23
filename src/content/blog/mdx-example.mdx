@@ -20,7 +20,7 @@ If you have existing content authored in MDX, this integration will hopefully ma
   tabs={[
     {
       language: "js",
-      filename:"example.js",
+      filename:"a/long-path/to/example.js",
       code: `
 const x = 1;
 
@@ -30,7 +30,14 @@ class Vert extends Component {
     },
     {
       language: "rb",
-      filename:"example.rb",
+      filename:"https://example.com/example.rb",
+      code: `
+x = 1
+`
+    },
+    {
+      language: "rb",
+      filename:"https://example.com/example2.rb",
       code: `
 x = 1
 `
