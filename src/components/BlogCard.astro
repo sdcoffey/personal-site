@@ -16,7 +16,7 @@ const { slug, title, description, pubDate, heroImage, class: className } = Astro
 <a
   href={`/blog/${slug}`}
   class:list={[
-    "not-prose bg-slate-40 rounded-lg border border-slate-200 no-underline shadow transition hover:-translate-y-px hover:shadow-lg",
+    "not-prose bg-slate-40 rounded-lg border border-slate-200 no-underline shadow transition hover:-translate-y-px hover:shadow-lg lg:max-w-[200px]",
     className,
   ]}
 >
@@ -25,7 +25,7 @@ const { slug, title, description, pubDate, heroImage, class: className } = Astro
       src={heroImage}
       alt={description}
       height={400}
-      width={400}
+      width={600}
       format="webp"
       class="image-noselect h-[200px] h-full max-h-[200px] w-full rounded-t-lg object-cover object-center"
     />
