@@ -1,5 +1,5 @@
 ---
-import { Image } from "astro:assets";
+import { Image, getImage } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 import { Footnotes, Howler, FormattedDate } from "../components";
 
@@ -11,9 +11,11 @@ type Props = CollectionEntry<"blog">["data"] & {
 
 const { title, description, pubDate, heroImage, heroImageCaption, headings } = Astro.props;
 const filteredHeaders = headings.filter(({ depth }) => depth < 4);
+
+const metaImg = await getImage({ src: heroImage, format: "webp", height: 800, width: 1200 });
 ---
 
-<MainLayout title={title} docTitle={title} docDescription={description} showNav={true}>
+<MainLayout title={title} docTitle={title} docDescription={description} showNav={true} image={metaImg.src}>
   <article class="padded-container article prose mx-auto prose-pre:rounded-sm prose-pre:bg-slate-200 prose-pre:p-1">
     <h1 class="page-title mb-2">{title}</h1>
     <h4>{description}</h4>
