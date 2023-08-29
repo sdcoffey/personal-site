@@ -1,29 +1,35 @@
-<hr class="mb-4 mt-12" />
-<h4>Footnotes</h4>
-<ol class="footnotes"></ol>
+<div class="footnotes-container">
+  <hr class="mb-4 mt-12" />
+  <h4>Footnotes</h4>
+  <ol class="footnotes-container__footnotes-list"></ol>
+</div>
 
 <script>
   const footnotes = document.querySelectorAll(".footnote-citation");
-  const container = document.querySelector(".footnotes");
+  const container = document.querySelector(".footnotes-container");
+  const list = container.querySelector(".footnotes-container__footnotes-list");
 
-  footnotes.forEach((footnote: HTMLAnchorElement) => {
-    const id = footnote.getAttribute("href").replace("#", "");
-    const { text, href } = footnote.dataset;
-    const li = document.createElement("li");
-    li.classList.add("text-sm");
-    li.id = id;
+  if (footnotes.length > 0) {
+    container.classList.remove("hidden");
+    footnotes.forEach((footnote: HTMLAnchorElement) => {
+      const id = footnote.getAttribute("href").replace("#", "");
+      const { text, href } = footnote.dataset;
+      const li = document.createElement("li");
+      li.classList.add("text-sm");
+      li.id = id;
 
-    if (href) {
-      const anchor = document.createElement("a") as HTMLAnchorElement;
-      anchor.href = href;
-      anchor.target = "_blank";
-      anchor.rel = "noopener noreferrer";
-      anchor.innerText = text;
-      li.appendChild(anchor);
-    } else {
-      li.innerText = text;
-    }
+      if (href) {
+        const anchor = document.createElement("a") as HTMLAnchorElement;
+        anchor.href = href;
+        anchor.target = "_blank";
+        anchor.rel = "noopener noreferrer";
+        anchor.innerText = text;
+        li.appendChild(anchor);
+      } else {
+        li.innerText = text;
+      }
 
-    container.appendChild(li);
-  });
+      list.appendChild(li);
+    });
+  }
 </script>
