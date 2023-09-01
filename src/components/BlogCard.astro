@@ -16,18 +16,18 @@ const { slug, title, description, pubDate, heroImage, class: className } = Astro
 <a
   href={`/blog/${slug}`}
   class:list={[
-    "not-prose bg-slate-40 rounded-lg border border-slate-200 no-underline shadow transition hover:-translate-y-px hover:shadow-lg lg:max-w-[200px]",
+    "not-prose bg-slate-40 rounded-lg flex flex-col border border-slate-200 no-underline shadow transition hover:-translate-y-px hover:shadow-lg lg:max-w-[200px]",
     className,
   ]}
 >
-  <div class="relative">
+  <div class="relative grow">
     <Image
       src={heroImage}
       alt={description}
       height={400}
       width={600}
       format="webp"
-      class="image-noselect h-[200px] h-full max-h-[200px] w-full rounded-t-lg object-cover object-center"
+      class="image-noselect h-[170px] w-full rounded-t-lg object-cover object-center"
     />
     <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/40 to-transparent p-4">
       <h2 class="text-lg font-semibold text-white">
@@ -36,9 +36,9 @@ const { slug, title, description, pubDate, heroImage, class: className } = Astro
     </div>
   </div>
 
-  <div class="flex flex-col gap-4 p-4 pt-3">
+  <div class="flex flex-shrink flex-col gap-4 p-4 pt-3">
     <FormattedDate date={pubDate} class="text-sm" />
-    <p class="line-clamp-2 font-light leading-tight text-slate-800">
+    <p class="line-clamp-2 font-light text-sm leading-tight text-slate-800">
       {description}
     </p>
   </div>

@@ -13,12 +13,11 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/mdx": "^0.19.7",
-    "@astrojs/preact": "^2.2.2",
+    "@astrojs/mdx": "^1.0.0",
     "@astrojs/rss": "^2.4.4",
     "@astrojs/sitemap": "^2.0.2",
     "@astrojs/tailwind": "^4.0.0",
-    "astro": "^2.10.9",
+    "astro": "^3.0.6",
     "astro-heroicons": "^0.3.0",
     "clsx": "^2.0.0",
     "preact": "^10.6.5",
