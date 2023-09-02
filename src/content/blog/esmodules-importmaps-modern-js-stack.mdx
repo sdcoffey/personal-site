@@ -138,19 +138,16 @@ then replacing calls to `require` or `import` with new functions that reference 
 
     Imagine this very complex code that we want to run in the browser:
 
-{" "}
-<CodeBlock tabs={["esmodules/math-module.js", "esmodules/math.js"]} />
+    <CodeBlock tabs={["esmodules/math-module.js", "esmodules/math.js"]} />
 
-Unfortunately, this code is **not** going to run in the browser as is, since, as we've established, CommonJS modules are not supported by any browser. Let's run it through esbuild and see what we get.
+    Unfortunately, this code is **not** going to run in the browser as is, since, as we've established, CommonJS modules are not supported by any browser. Let's run it through esbuild and see what we get.
 
-{" "}
-<CodeBlock tabs={["esmodules/bundle-math.js"]} />
+    <CodeBlock tabs={["esmodules/bundle-math.js"]} />
 
     There's obviously a lot going on there, but the key thing to note is that all of our code is now in one file,
     and our `require` statement has been replaced with a call to a new function, `require_math` that loads our code from what was previously the standalone file `math.js`.
 
     All of the code is wrapped in an IIFE (**Immediately Invoked Function Expression**, pronounced "iffy") which keeps any of this code from leaking into the global namespace.
-
 </details>
 
 ### Historical reason 2: HTTP/1.x
