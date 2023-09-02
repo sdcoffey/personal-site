@@ -1,11 +1,51 @@
 ---
-import { Code } from "astro/components";
+import fs from 'fs';
+import path from 'path'
+import fm from 'front-matter';
+import { joinToProjectRoot } from "../utilities";
+
+import { Code } from 'astro/components';
+
+type Tab = {
+  filename: string;
+  code: string;
+  language: string;
+  class: string;
+}
 
 type Props = {
-  tabs: Array<{ filename: string; language: string; code: string; class?: string }>;
+  tabs: Array<Tab | string>;
 };
 
 const { tabs } = Astro.props;
+
+function readTab(tab: Tab | string): { filename: string, code: string, language: string } {
+  if (typeof tab === "string") {
+    const filepath = joinToProjectRoot('src/snippets', tab)
+    const src = fs.readFileSync(filepath, "utf-8");
+
+    if (fm.test(src)) {
+      const { attributes, body } = fm(src);
+      return { filename: attributes.filename, code: body, language: attributes.language };
+    }
+
+    const filename = path.basename(tab);
+    const language = path.extname(tab).replace(".", "");
+
+    return { filename, code: src, language };
+  } else {
+    if (!tab.filename || !tab.code || !tab.language) {
+      throw new Error("Missing filename, code, or language");
+    }
+
+    return {
+      filename: tab.filename,
+      code: tab.code,
+      language: tab.language,
+    };
+  }
+}
+
 ---
 
 <div class="code-tabs-container">
@@ -14,22 +54,26 @@ const { tabs } = Astro.props;
   >
     {
       tabs.map((tab) => (
-        <div data-filename={tab.filename} class="code-tabs-container__tab">
-          {tab.filename}
+        <div data-filename={readTab(tab).filename} class="code-tabs-container__tab">
+          {readTab(tab).filename}
         </div>
       ))
     }
   </div>
   <div>
     {
-      tabs.map((tab) => (
-        <div class:list={["code-tabs-container__code-container", tab.class]} data-filename={tab.filename}>
-          <button data-code-copy-button data-code-copy-content={tab.code} class="code-tabs-container__copy-button">
-            Copy
-          </button>
-          <Code lang={tab.language} code={tab.code.trim()} />
-        </div>
-      ))
+      tabs.map((tab) => {
+        const { filename, code, language } = readTab(tab);
+        console.log(filename, code, language);
+        return (
+          <div class:list={["code-tabs-container__code-container", tab.class]} data-filename={filename}>
+            <button data-code-copy-button data-code-copy-content={code} class="code-tabs-container__copy-button">
+              Copy
+            </button>
+            <Code lang={language} code={code.trim()} />
+          </div>
+        )
+      })
     }
   </div>
 </div>
