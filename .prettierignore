@@ -2,4 +2,4 @@
 dist/*
 .idea/*
 .netlify/*
-.vscode/*
+.vscode/*snippets/

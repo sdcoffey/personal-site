@@ -1,15 +1,15 @@
-import path from 'path';
-import fs from 'fs';
-import url from 'url'
+import fs from "fs";
+import path from "path";
+import url from "url";
 
 function isRoot(path: string): boolean {
-  return fs.readdirSync(path).includes('package.json');
+  return fs.readdirSync(path).includes("package.json");
 }
 
 export function projectRootPath(): string {
-  let currentDir = path.resolve(url.fileURLToPath(import.meta.url), '..');
+  let currentDir = path.resolve(url.fileURLToPath(import.meta.url), "..");
   while (!isRoot(currentDir)) {
-    currentDir = path.resolve(currentDir, '..');
+    currentDir = path.resolve(currentDir, "..");
   }
 
   return currentDir;

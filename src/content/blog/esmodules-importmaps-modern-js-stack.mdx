@@ -6,7 +6,7 @@ heroImage: ../../assets/honeycomb.jpg
 heroImageCaption: 'Photo by <a href="https://unsplash.com/@jobsavelsberg?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Job Savelsberg</a> on <a href="https://unsplash.com/photos/muoL8rkvAXo?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>'
 ---
 
-import tlsHandshake from '../../assets/tls-ssl-handshake.png';
+import tlsHandshake from "../../assets/tls-ssl-handshake.png";
 import scriptingWheel from "../../assets/scripting-wheel.png";
 import { Image } from "astro:assets";
 import { Aside, CodeBlock, Footnote } from "../../components";
@@ -41,6 +41,7 @@ In this example, when this module is loaded, Node would go looking for `lodash` 
 Here, we're able to specify that `lodash` should be imported from a remote URL, in this case the CDN esm.sh.
 
 ### Browser support
+
 CommonJS modules have **never been supported in the browser**, while ESM is now supported by Node<Footnote text="ES Modules are supported by Node, but some things, like remote loading demonstrated here, do not work out of the box."/>
 the vast majority of browsers<Footnote text="Can I use ESM?" href="https://caniuse.com/?search=ESM"/>, and alternative JS runtimes like [Deno](https://deno.land) and [Bun](https://bun.sh).
 
@@ -62,10 +63,7 @@ In this way, you can think of an importmap for the browser as serving the same f
 
 Here's the same script above rewritten for the browser, using importmaps.
 
-<CodeBlock tabs={[
-  "esmodules/html-with-module.html",
-  "esmodules/mjs-with-cjs-import.js"
-]} />
+<CodeBlock tabs={["esmodules/html-with-module.html", "esmodules/mjs-with-cjs-import.js"]} />
 
 <details>
     <summary>What's going on here?</summary>
@@ -77,9 +75,11 @@ Here's the same script above rewritten for the browser, using importmaps.
     Because `lodash` is not an absolute or relative import, it will refer to the importmap to resolve the module.
 
     Having resolved `lodash` to `https://esm.sh/lodash@4.17.21`, it will fetch the module, and continue executing `module.mjs`.
+
 </details>
 
 ### Browser support
+
 Importmaps are supported by only 85%<Footnote text="Can I use import maps?" href="https://caniuse.com/import-maps"/> of browsers, but there's [a nice polyfill](https://github.com/guybedford/es-module-shims)
 that you can use to bump that up into the 90s if you care to do so.
 
@@ -138,11 +138,13 @@ then replacing calls to `require` or `import` with new functions that reference 
 
     Imagine this very complex code that we want to run in the browser:
 
-  <CodeBlock tabs={["esmodules/math-module.js", "esmodules/math.js"]} />
+{" "}
+<CodeBlock tabs={["esmodules/math-module.js", "esmodules/math.js"]} />
 
 Unfortunately, this code is **not** going to run in the browser as is, since, as we've established, CommonJS modules are not supported by any browser. Let's run it through esbuild and see what we get.
 
-  <CodeBlock tabs={["esmodules/bundle-math.js"]} />
+{" "}
+<CodeBlock tabs={["esmodules/bundle-math.js"]} />
 
     There's obviously a lot going on there, but the key thing to note is that all of our code is now in one file,
     and our `require` statement has been replaced with a call to a new function, `require_math` that loads our code from what was previously the standalone file `math.js`.
@@ -161,21 +163,19 @@ If you're using TLS, two roundtrips are required to perform a TLS handshake befo
 Then, when the request is finished, you have to close this connection and start fresh on the next request.
 
 <figure>
-<Image
-  src={tlsHandshake}
-  format={"webp"}
-  width={1000}
-  height={571}
-  alt={"A TLS 1.2 handshaek"}
-/>
-  <figcaption>A TLS 1.2 handshake. Blue is the TCP handshake, yellow is the TLS handshake. Graphic courtesy of the [Cloudflare Blog](https://www.cloudflare.com/learning/ssl/what-happens-in-a-tls-handshake/)</figcaption>
+  <Image src={tlsHandshake} format={"webp"} width={1000} height={571} alt={"A TLS 1.2 handshaek"} />
+  <figcaption>
+    A TLS 1.2 handshake. Blue is the TCP handshake, yellow is the TLS handshake. Graphic courtesy of the [Cloudflare
+    Blog](https://www.cloudflare.com/learning/ssl/what-happens-in-a-tls-handshake/)
+  </figcaption>
 </figure>
 
 <Aside>
   <h2 slot="header">TLS 1.3</h2>
   <slot>
-    Before I get any neckbeards in my DMs letting me know that fewer roundtrips are required to perform a handshake with TLS 1.3, let me say:
-    while that is true, TLS 1.3 wasn't released until 2018, well after many websites were already using HTTP/2.
+    Before I get any neckbeards in my DMs letting me know that fewer roundtrips are required to perform a handshake with
+    TLS 1.3, let me say: while that is true, TLS 1.3 wasn't released until 2018, well after many websites were already
+    using HTTP/2.
   </slot>
 </Aside>
 
@@ -221,11 +221,7 @@ When we transpile that code, the transpiler is ripping out all of that HTML and 
 
 Here are the relevant sections again for clarity:
 
-<CodeBlock
-  tabs={[
-    "esmodules/react-zoom.jsx",
-    "esmodules/react-zoom-output.js",
-  ]} />
+<CodeBlock tabs={["esmodules/react-zoom.jsx", "esmodules/react-zoom-output.js"]} />
 
 <details>
   <summary>What's `import_jsx_runtime.jsx`?</summary>
@@ -252,6 +248,7 @@ simply `h` in Preact.
 
     Transpilation might occur because you're using ES6 features but are targeting browsers that only support ES5, or in this case, because
     you want to use JSX instead of writing `React.createElement` everywhere.
+
   </slot>
 </Aside>
 
@@ -304,6 +301,7 @@ that it's a different file.
     time-42c814022932fa83186babe7c496f82947d17c415aaa8bbc31b469b91ebdc5cb.js
     ```
     </slot>
+
 </Aside>
 
 In the above example, my change of heart with respect to the `function` keyword only invalidated 47 bytes of JS. If this had been part of a large bundle including other modules and dependencies, it might have invalidated hundreds of kilobytes or more.
@@ -354,23 +352,21 @@ I use Rails and Sprockets to build 99% of my web projects. I'll save why for ano
 for building importmaps in Rails.
 
 <CodeBlock
-tabs={[
-  "esmodules/import_map_initializer.rb",
-  "esmodules/application-layout.html",
-  "esmodules/lib_import_map.rb"
-]}
+  tabs={["esmodules/import_map_initializer.rb", "esmodules/application-layout.html", "esmodules/lib_import_map.rb"]}
 />
 
-
 There are three main things I want to highlight above:
-  1. `config/initializers/import_map.rb` contains a declaration of all the dependencies I want to be included in my importmap. Any remote dependencies are resolved using esm.sh with the version from `package.json`.
+
+1. `config/initializers/import_map.rb` contains a declaration of all the dependencies I want to be included in my importmap. Any remote dependencies are resolved using esm.sh with the version from `package.json`.
 1. In my application layout, I added an `importmap` script in the `head` element which renders the JSON output of `ImportMap`.
 1. The `ImportMap` class handles declaring the resolutions for external dependencies, as well as resolving local dependencies from Sprockets.
 
 <Aside>
   <h2 slot="header">Why not use `importmap-rails`?</h2>
   <slot>
-    Well, it famously does not, [nor will not](https://github.com/rails/importmap-rails/issues/124#issuecomment-1113969386), support Typescript. Luckily, it's not that hard to roll yourself using sprockets and esbuild.
+    Well, it famously does not, [nor will
+    not](https://github.com/rails/importmap-rails/issues/124#issuecomment-1113969386), support Typescript. Luckily, it's
+    not that hard to roll yourself using sprockets and esbuild.
   </slot>
 </Aside>
 
@@ -384,12 +380,8 @@ That would be very annoying to implement so a better approach is to just ensure 
 Using non-relative paths requires some config changes in Typescript in order for the compiler to successfully type-check your code.
 
 For example:
-<CodeBlock
-  tabs={[
-    "esmodules/PriceLevel.tsx",
-    "esmodules/tsconfig.json",
-    "esmodules/import_map.json",
-  ]} />
+
+<CodeBlock tabs={["esmodules/PriceLevel.tsx", "esmodules/tsconfig.json", "esmodules/import_map.json"]} />
 
 ### esbuild
 
@@ -411,7 +403,6 @@ stripping types and transpiling JSX. If I weren't using either Typscript or Prea
   <CodeBlock tabs={["esmodules/transpile-react-example/IconButton.tsx", "esmodules/transpile-react-example/transpile-output.js"]} />
 </details>
 
-
 ### ES Module CDN: esm.sh
 
 Using CDNs to deliver ES Modules to the browser has a bunch of advantages:
@@ -424,7 +415,6 @@ There are bunch of really great ES Module CDNs out there, but I use [esm.sh](htt
 esm.sh has some really cool features, like the ability to alias dependencies to support things like [preact/compat](https://esm.sh/#docs), and
 has generally been very solid for my needs.
 
-
 ### Server-side rendering
 
 Rails in many ways is the archetypal MVC framework. Server rendering is what it's designed for and what it's really, really good at.
@@ -433,22 +423,21 @@ interactivity while your React/Preact components mount. This is a topic for a en
 and a few learnings briefly.
 
 1. I try really hard **not** to have any fully client-rendered pages, especially my landing page. It's both bad for SEO, being hard
-for some search engines to crawl, and it adds a ton of wait time for the page to become interactive. We try to sprinkle in
-rich components among server-rendered markup.
+   for some search engines to crawl, and it adds a ton of wait time for the page to become interactive. We try to sprinkle in
+   rich components among server-rendered markup.
 1. Use a separate Node server to SSR your Preact components. I'll write another blog post about this sometime, but essence
-what we do is use use a [ViewComponent](https://viewcomponent.org/) to call our Preact SSR server during rendering, which returns HTML that's
-sent back to the client, along with some client-side js to hydrate the component if needed.
+   what we do is use use a [ViewComponent](https://viewcomponent.org/) to call our Preact SSR server during rendering, which returns HTML that's
+   sent back to the client, along with some client-side js to hydrate the component if needed.
 1. If you can't do the above, try not to use any fully client-rendered components above the fold on your landing page.
-
 
 <Aside>
   <h2 slot={"header"}>Next, Nuxt, and the rest</h2>
 
-  I don't have too much experience with these. If they do all of these thing right out of the box, great! Let me know and I'll add an addendum.
+I don't have too much experience with these. If they do all of these thing right out of the box, great! Let me know and I'll add an addendum.
 
-  This website was built using [Astro](https://astro.build) which also evangelizes the reactivity-islands approach and does handle all of these ES Module niceties for you.
+This website was built using [Astro](https://astro.build) which also evangelizes the reactivity-islands approach and does handle all of these ES Module niceties for you.
+
 </Aside>
-
 
 ## The net-net
 
@@ -458,10 +447,9 @@ has real impacts on people and businesses.
 Philosophically, life is short and it's kinda sad that we'll spend a nontrival
 percentage of our lives just waiting for websites to load. Less philosophically, page performance has impacts on all businesses.
 Better page speeds have impacts across SEO,<Footnote text="Google blog: Speed is now a landing page factor for Google Search and Ads" href="https://developer.chrome.com/blog/search-ads-speed/"/>
- conversion,<Footnote text="Elise Dopson: Website speed optimization" href="https://www.shopify.com/enterprise/site-performance-page-speed-ecommerce"/>
+conversion,<Footnote text="Elise Dopson: Website speed optimization" href="https://www.shopify.com/enterprise/site-performance-page-speed-ecommerce"/>
 and engagement,<Footnote text="Pingdom blog: Does page load time really affect bounce rate?" href="https://www.pingdom.com/blog/page-load-time-really-affect-bounce-rate/" />
 all of which can result in fewer customers and less money when not optimized.
 
 My point, simply, is this: don't shoot yourself in the foot. A modern stack with modern, simple tooling can deliver a
 meaningful bump in pageload performance with very little lift on your part.
-
