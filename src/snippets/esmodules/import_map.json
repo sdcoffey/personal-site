@@ -1,0 +1,6 @@
+{
+  "imports": {
+    // ...
+    "utilities/dollarsigns": "/assets/javascript/dollarsigns-abcd0123.js"
+  }
+}

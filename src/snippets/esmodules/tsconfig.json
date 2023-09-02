@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    // ...
+    // paths helps typescript map a non-relative path to a relative one
+    "paths": {
+      "utilities/*": ["./app/javascript/utilities/*"],
+    }
+  },
+}

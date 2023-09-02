@@ -32,27 +32,11 @@ There are two main module systems:
 
 Here's the same module written for both CJS and ESM:
 
-```js
-// module.cjs
-const merge = require("lodash").merge;
-
-function addPi(target) {
-  return merge(target, { pi: 3.14 });
-}
-
-module.exports = addPi;
-```
+<CodeBlock tabs={["esmodules/cjs-module-example.js"]} />
 
 In this example, when this module is loaded, Node would go looking for `lodash` in our `node_modules/` folder, and make your function, `addPi`, available as a default export to any other modules requiring it.
 
-```js
-// module.mjs
-import { merge } from "https://esm.sh/lodash@4.17.21";
-
-export default function addPi(target) {
-  return merge(target, { pi: 3.14 });
-}
-```
+<CodeBlock tabs={["esmodules/mjs-module-example.js"]} />
 
 Here, we're able to specify that `lodash` should be imported from a remote URL, in this case the CDN esm.sh.
 
@@ -78,28 +62,10 @@ In this way, you can think of an importmap for the browser as serving the same f
 
 Here's the same script above rewritten for the browser, using importmaps.
 
-```html
-<!-- index.html -->
-<head>
-  <script type="importmap">
-    {
-      "imports": {
-        "lodash": "https://esm.sh/lodash@4.17.21"
-      }
-    }
-  </script>
-  <script type="module" src="/module.mjs"></script>
-</head>
-```
-
-```js
-// module.mjs
-import { merge } from "lodash";
-
-export default function addPi(target) {
-  return merge(target, { pi: 3.14 });
-}
-```
+<CodeBlock tabs={[
+  "esmodules/html-with-module.html",
+  "esmodules/mjs-with-cjs-import.js"
+]} />
 
 <details>
     <summary>What's going on here?</summary>
@@ -139,18 +105,7 @@ name they hoped was unique enough not to conflict with your code or other librar
 
 You might be old enough to remember writing some code like this:
 
-```html
-<head>
-  <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js"></script>
-</head>
-<body>
-  <div id="my-div"></div>
-
-  <script>
-    var myDiv = $("#my-div");
-  </script>
-</body>
-```
+<CodeBlock tabs={["esmodules/html-with-jquery.html"]} />
 
 Where is `$` coming from? Well, it's declared in `jquery-3.7.0.slim.min.js`, and available everywhere thereafter.
 
@@ -183,57 +138,11 @@ then replacing calls to `require` or `import` with new functions that reference 
 
     Imagine this very complex code that we want to run in the browser:
 
-```js
-// math.js
-function add(a, b) {
-  return a + b;
-}
-
-function subtract(a, b) {
-  return a - b;
-}
-
-module.exports = { add, subtract };
-```
-
-```js
-// module.js
-const { add, subtract } = require("./math");
-
-console.log(add(1, 2));
-console.log(subtract(1, 2));
-```
+  <CodeBlock tabs={["esmodules/math-module.js", "esmodules/math.js"]} />
 
 Unfortunately, this code is **not** going to run in the browser as is, since, as we've established, CommonJS modules are not supported by any browser. Let's run it through esbuild and see what we get.
 
-```js
-// esbuild --bundle module.js
-(() => {
-  var __getOwnPropNames = Object.getOwnPropertyNames;
-  var __commonJS = (cb, mod) =>
-    function __require() {
-      return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-    };
-
-  // math.js
-  var require_math = __commonJS({
-    "math.js"(exports, module) {
-      function add2(a, b) {
-        return a + b;
-      }
-      function subtract2(a, b) {
-        return a - b;
-      }
-      module.exports = { add: add2, subtract: subtract2 };
-    },
-  });
-
-  // module.js
-  var { add, subtract } = require_math();
-  console.log(add(1, 2));
-  console.log(subtract(1, 2));
-})();
-```
+  <CodeBlock tabs={["esmodules/bundle-math.js"]} />
 
     There's obviously a lot going on there, but the key thing to note is that all of our code is now in one file,
     and our `require` statement has been replaced with a call to a new function, `require_math` that loads our code from what was previously the standalone file `math.js`.
@@ -296,37 +205,11 @@ Today, 96%<Footnote href="https://caniuse.com/?search=es6" text="Can I use ES6?"
 Depending on what your stack looks like, you might need to reference external assets, like images, from your JS. This is also one of the jobs of the bundler.
 Let's look at a React example:
 
-```jsx
-// react.jsx
-import plus from "./plus.svg";
-
-export default function Counter() {
-  return (
-    <button>
-      <img src={plus} />
-    </button>
-  );
-}
-```
+<CodeBlock tabs={["esmodules/react-svg-example.jsx"]} />
 
 When we run this through esbuild, we get the following output, with the svg inlined directly into the bundle as a URL string.
 
-```js
-// esbuild --bundle --loader:.svg=dataurl --jsx=automatic react.jsx
-
-var plus_default =
-  'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">%0A  <path d="M10.75 6.75a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" />%0A</svg>%0A';
-
-// react.jsx
-var import_jsx_runtime = __toESM(require_jsx_runtime());
-function Counter() {
-  return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-    children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-      src: plus_default,
-    }),
-  });
-}
-```
+<CodeBlock tabs={["esmodules/esbuild-react-svg.js"]} />
 
 ### Modern reason 2: JSX
 
@@ -338,24 +221,11 @@ When we transpile that code, the transpiler is ripping out all of that HTML and 
 
 Here are the relevant sections again for clarity:
 
-```jsx
-// react.jsx
-return (
-  <button>
-    <img src={plus} />
-  </button>
-);
-```
-
-Is transpiled into:
-
-```js
-return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-  children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-    src: plus_default,
-  }),
-});
-```
+<CodeBlock
+  tabs={[
+    "esmodules/react-zoom.jsx",
+    "esmodules/react-zoom-output.js",
+  ]} />
 
 <details>
   <summary>What's `import_jsx_runtime.jsx`?</summary>
@@ -418,10 +288,7 @@ that it's a different file.
     <h2 slot="header">For example:</h2>
     <slot>
     Imagine that we have this simple JS file served by our app:
-    ```js
-    // time.js
-    export function getTime() { return new Date() }
-    ```
+    <CodeBlock tabs={["esmodules/time-01.js"]} />
 
     Most frameworks will give this file a fingerprinted name. Sprockets (the asset pipeline for Rails), will assign this file the name:
     ```
@@ -430,10 +297,7 @@ that it's a different file.
     ```
 
     Let's say I get bored with the `function` keyword:
-    ```js
-    // time.js
-    export const getTime = () => new Date();
-    ```
+    <CodeBlock tabs={["esmodules/time-02.js"]} />
 
     Guess what? Now it has a new fingerprint:
     ```
@@ -491,160 +355,9 @@ for building importmaps in Rails.
 
 <CodeBlock
 tabs={[
-  {
-    language: "ruby",
-    filename: "config/initializers/import_map.rb",
-    code: `
-# frozen_string_literal: true
-
-require_relative '../../app/lib/import_map'
-
-ImportMap.configure do |map|
-  # "import" is an external dependency
-  map.import '@hotwired/stimulus'
-  map.import '@hotwired/turbo-rails'
-  map.import 'preact', include_subpackages: true
-  map.import 'framer-motion', alias: 'react:preact/compat'
-  map.import 'dayjs', include_subpackages: true
-
-  # "module" is a local module
-  map.module 'dayjs-init'
-
-  # "mount_directory" adds all modules from a given dir, optionally recursive
-  map.mount_directory 'controllers'
-end
-
-# This will translate to something like:
-=begin
-{
-  "imports": {
-    "@hotwired/stimulus": "https://esm.sh/@hotwired/stimulus@^3.2.2?",
-    "@hotwired/turbo-rails": "https://esm.sh/@hotwired/turbo-rails@^7.3.0?",
-    "preact": "https://esm.sh/preact@^10.15.0?",
-    "preact/": "https://esm.sh/preact@^10.15.0&/",
-    "framer-motion": "https://esm.sh/framer-motion@^10.12.18?alias=react%3Apreact%2Fcompat",
-    "dayjs": "https://esm.sh/dayjs@^1.11.9?",
-    "dayjs/": "https://esm.sh/dayjs@^1.11.9&/",
-    "dayjs-init": "/assets/javascript/dayjs-init-ec6c761b40bf461c97802604889b78483fba390ed83fcb83392ec41c42335cd7.js",
-    "controllers/video-animator": "/assets/javascript/controllers/video-animator-4ad13c3a74253bc208a6d3ec79d8c3d65817f3ecd1de9759f18945c6d413c882.js"
-  }
-}
-=end
-`
-  },
-  {
-    language: "erb",
-    filename: "app/layouts/application.html.erb",
-    code: `
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= csrf_meta_tags %>
-
-    <script type="importmap">
-      <%= ImportMap.to_json.html_safe %>
-    </script>
-
-    ...
-`
-  },
-  {
-    filename: "app/lib/import_map.rb",
-    language: "ruby",
-    class: "scrollable-code",
-    code: `
-# frozen_string_literal: true
-
-class ImportMap
-  class Configuration
-    def initialize
-      @imports = []
-      @modules = Set.new
-    end
-
-    def import(name, **options)
-      dep_alias, include_subpackages = options.values_at(:alias, :include_subpackages)
-
-      version = package_version(name)
-      @imports << { name:, version:, remote: remote_specifier(name, version, dep_alias:) }
-
-      return unless include_subpackages
-
-      slash_name = "#{name}/"
-      @imports << { name: slash_name, version:, remote: remote_specifier(name, version, dep_alias:, slash: true) }
-    end
-
-    def module(name)
-      @modules.add(name)
-    end
-
-    def mount_directory(folder, recursive: false)
-      root_path = Rails.root.join('app/javascript', folder)
-      globbable = Rails.root.join("#{root_path}/*.{ts,tsx}").to_s
-      globbable = Rails.root.join("#{root_path}/**/*.{ts,tsx}").to_s if recursive
-
-      Rails.root.glob(globbable).map(&:to_s).each do |path|
-        next if path.include?('.test')
-
-        relative_to_root = Pathname.new(path).relative_path_from(root_path).dirname
-        joinable = [folder, relative_to_root, File.basename(path, File.extname(path))].reject { _1.to_s == '.' }
-        module_name = File.join(*joinable)
-        @modules << module_name
-      end
-    end
-
-    attr_reader :imports, :modules
-
-    private
-
-    def package_version(package)
-      package_path = Rails.root.join('package.json')
-      package_dependencies = JSON.parse(package_path.read)['dependencies']
-
-      raise "Package #{package} not found in #{package_path}" unless package_dependencies.key?(package)
-
-      package_dependencies[package]
-    end
-
-    def remote_specifier(name, version, slash: false, dep_alias: nil)
-      base = "https://esm.sh/#{name}@#{version}"
-
-      query = { alias: dep_alias }.compact
-
-      return "#{base}&#{query.to_query}/" if slash
-
-      "#{base}?#{query.to_query}"
-    end
-  end
-
-  class << self
-    def config
-      @config ||= Configuration.new
-    end
-
-    def configure
-      yield config
-    end
-
-    def to_json(*_args)
-      all_imports = config.imports.to_h { [_1[:name], _1[:remote]] }
-      all_components = config.modules.index_with do |mod|
-        module_specifier(mod)
-      end
-
-      JSON.pretty_generate({ imports: { **all_imports, **all_components } })
-    end
-
-    def module_specifier(name)
-      return "/assets/javascript/#{name}.js" unless Rails.env.production?
-
-      ActionController::Base.helpers.javascript_path("javascript/#{name}")
-    end
-  end
-end
-`
-  },
+  "esmodules/import_map_initializer.rb",
+  "esmodules/application-layout.html",
+  "esmodules/lib_import_map.rb"
 ]}
 />
 
@@ -672,56 +385,11 @@ Using non-relative paths requires some config changes in Typescript in order for
 
 For example:
 <CodeBlock
-tabs={[
-  {
-    filename: "app/javascript/components/PriceLevel.tsx",
-    language: "typescript",
-    code: `
-import type { VNode } from 'preact';
-
-/**
- * 'utilities/dollarsigns' is a local module referenced
- * with a non-relative path.
- * We need to tell typescript how to resolve this non-relative path
- */
-import dollarSigns from "utilities/dollarsigns";
-
-export default function PriceLevel(props: { count: number }): VNode {
-  return (
-    <p>Price: {dollarSigns(count)}</p>
-  );
-}
-    `
-  },
-  {
-    filename: "tsconfig.json",
-    language: "json",
-    code: `
-{
-  "compilerOptions": {
-    // ...
-    // paths helps typescript map a non-relative path to a relative one
-    "paths": {
-      "utilities/*": ["./app/javascript/utilities/*"],
-    }
-  },
-}
-    `
-  },
-  {
-    filename: "import_map.json",
-    language: "json",
-    code: `
-{
-  "imports": {
-    // ...
-    "utilities/dollarsigns": "/assets/javascript/dollarsigns-abcd0123.js"
-  }
-}
-    `
-  }
-  ]}
-/>
+  tabs={[
+    "esmodules/PriceLevel.tsx",
+    "esmodules/tsconfig.json",
+    "esmodules/import_map.json",
+  ]} />
 
 ### esbuild
 
@@ -731,42 +399,7 @@ and requires limited configuration out of the box. It's also set up perfectly to
 I have a pretty straightforward esbuild setup that globs all of my JS entrypoints and outputs them into a folder
 where they can be picked up by Sprockets:
 
-<CodeBlock
-  tabs={[
-{
-  language: "js",
-  filename: "esbuild.mjs",
-  code:`
-import * as esbuild from 'esbuild'
-import { glob } from "glob";
-
-(async () => {
-  // Ignore all test files
-  const ignore = {
-    ignored: (p) => /^.*\.test\.tsx?$/.test(p.name),
-  }
-
-  let entryPoints = await glob("./app/javascript/**/*.*", {
-    ignore
-  });
-
-  // also transpile any js associated with a ViewComponent
-  entryPoints = entryPoints.concat(await glob("./app/components/**/*.ts", { ignore }));
-
-  const buildContext = await esbuild.build({
-    entryPoints,
-    bundle: false,
-    format: "esm", // 👈 this is the key config
-    outdir: "app/assets/builds", // sprockets will pick up transpiled assets from here
-    publicPath: "assets",
-    loader: {
-      ".svg": "dataurl",
-    },
-  });
-})();
-  `
-}
-]}/>
+<CodeBlock tabs={["esmodules/esbuild.mjs"]} />
 
 With this config, esbuild is doing _almost nothing_ to my source code. With my setup (Typescript and Preact), it's just
 stripping types and transpiling JSX. If I weren't using either Typscript or Preact, I wouldn't need this step at all.
@@ -775,55 +408,7 @@ stripping types and transpiling JSX. If I weren't using either Typscript or Prea
   <summary>Show me</summary>
   Here's a simple preact component from one of my projects:
 
-  ```typescript
-  // IconButton.tsx
-
-  import cx from "clsx";
-  import { VNode } from "preact";
-
-  type Props = {
-    class?: string;
-    Icon: VNode;
-    onClick: () => void;
-  };
-
-  export default function IconButton(props: Props): VNode {
-    return (
-      <button
-        onClick={props.onClick}
-        class={cx(
-          "flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition hover:border-slate-400 hover:shadow",
-          props.class
-        )}
-      >
-        {props.Icon}
-      </button>
-    );
-  }
-  ```
-
-which will get transpiled to:
-
-```js
-import { jsx } from "preact/jsx-runtime";
-import cx from "clsx";
-function IconButton(props) {
-  return /* @__PURE__ */ jsx(
-    "button",
-    {
-      onClick: props.onClick,
-      class: cx(
-        "flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition hover:border-slate-400 hover:shadow",
-        props.class
-      ),
-      children: props.Icon
-    }
-  );
-}
-export {
-  IconButton as default
-};
-```
+  <CodeBlock tabs={["esmodules/transpile-react-example/IconButton.tsx", "esmodules/transpile-react-example/transpile-output.js"]} />
 </details>
 
 

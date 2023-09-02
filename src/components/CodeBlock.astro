@@ -7,6 +7,8 @@ import { joinToProjectRoot } from "../utilities";
 import { Code } from 'astro/components';
 
 type Tab = {
+  bash?: string;
+  copyable?: boolean;
   filename: string;
   code: string;
   language: string;
@@ -17,35 +19,43 @@ type Props = {
   tabs: Array<Tab | string>;
 };
 
-const { tabs } = Astro.props;
 
-function readTab(tab: Tab | string): { filename: string, code: string, language: string } {
+function readTab(tab: Tab | string): { class: string, filename: string, code: string, language: string, copyable: boolean } {
   if (typeof tab === "string") {
     const filepath = joinToProjectRoot('src/snippets', tab)
     const src = fs.readFileSync(filepath, "utf-8");
+    const ext = path.extname(tab).replace(".", "");
 
     if (fm.test(src)) {
+      type Attributes = { class?: string, filename?: string, language?: string, bash?: string, copyable?: boolean }
       const { attributes, body } = fm(src);
-      return { filename: attributes.filename, code: body, language: attributes.language };
+      return {
+        class: attributes.class ?? "",
+        bash: attributes.bash,
+        filename: attributes.filename,
+        code: body,
+        language: attributes.language ?? ext,
+        copyable: attributes.copyable ?? false
+      };
     }
 
-    const filename = path.basename(tab);
-    const language = path.extname(tab).replace(".", "");
-
-    return { filename, code: src, language };
+    return { filename: path.basename(tab), code: src, language: ext, copyable: false, class: "" }
   } else {
     if (!tab.filename || !tab.code || !tab.language) {
       throw new Error("Missing filename, code, or language");
     }
 
     return {
+      class: tab.class ?? "",
       filename: tab.filename,
       code: tab.code,
       language: tab.language,
+      copyable: tab.copyable ?? false
     };
   }
 }
 
+const { tabs } = Astro.props;
 ---
 
 <div class="code-tabs-container">
@@ -54,7 +64,7 @@ function readTab(tab: Tab | string): { filename: string, code: string, language:
   >
     {
       tabs.map((tab) => (
-        <div data-filename={readTab(tab).filename} class="code-tabs-container__tab">
+        <div data-filename={readTab(tab).filename} class:list={["code-tabs-container__tab", { "no-underline": tabs.length === 1}]}>
           {readTab(tab).filename}
         </div>
       ))
@@ -63,14 +73,27 @@ function readTab(tab: Tab | string): { filename: string, code: string, language:
   <div>
     {
       tabs.map((tab) => {
-        const { filename, code, language } = readTab(tab);
-        console.log(filename, code, language);
+        const { class: cls, copyable, bash, filename, code, language } = readTab(tab);
         return (
-          <div class:list={["code-tabs-container__code-container", tab.class]} data-filename={filename}>
-            <button data-code-copy-button data-code-copy-content={code} class="code-tabs-container__copy-button">
-              Copy
-            </button>
-            <Code lang={language} code={code.trim()} />
+          <div class="code-tabs-container__code-container" data-filename={filename}>
+            {bash && (
+              <div>
+                  <Code lang="bash" code={`$ ${bash.trim()}`} class="border border-b" />
+                  <div class="flex flex-row gap-2 items-center !my-0 !py-0 bg-slate-800">
+                    <hr class="border-slate-700 my-0 w-8 flex-shrink-0" />
+                    <p class="my-0 text-slate-600 text-xs font-mono">Output</p>
+                      <hr class="border-slate-700 my-0 w-12 grow" />
+                  </div>
+              </div>
+            )}
+            <div class:list={[cls, { "code-rounded-b-lg": true } ]}>
+              {!bash && copyable && (
+                <button data-code-copy-button data-code-copy-content={code} class="code-tabs-container__copy-button">
+                    Copy
+                </button>
+              )}
+              <Code lang={language} code={code.trim()} />
+            </div>
           </div>
         )
       })
@@ -95,8 +118,14 @@ function readTab(tab: Tab | string): { filename: string, code: string, language:
         @apply hidden;
       }
 
+      .code-rounded-b-lg {
+        pre.astro-code {
+          @apply !rounded-b-lg;
+        }
+      }
+
       pre.astro-code {
-        @apply !my-0 !rounded-t-none;
+        @apply !my-0 !rounded-t-none !rounded-b-none;
       }
     }
 
