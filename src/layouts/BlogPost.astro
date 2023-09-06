@@ -131,6 +131,19 @@ const metaImg = await getImage({ src: heroImage, format: "webp", height: 800, wi
       }
     }
 
+    .header-caption {
+      @apply text-sm font-semibold text-slate-500;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      &:has(+ .header-caption) {
+        @apply mb-0;
+      }
+    }
+
     #in-this-post + ul {
       @apply flex list-none flex-col gap-2 pl-0;
 
@@ -155,7 +168,7 @@ const metaImg = await getImage({ src: heroImage, format: "webp", height: 800, wi
     img {
       @apply mx-auto mt-12 w-auto rounded-lg object-contain shadow-sm;
 
-      & + figcaption {
+      & ~ figcaption {
         @apply text-center text-sm text-slate-500;
 
         a {

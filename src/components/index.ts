@@ -1,6 +1,7 @@
 export { default as Aside } from "./Aside.astro";
 export { default as BaseHead } from "./BaseHead.astro";
 export { default as BlogCard } from "./BlogCard.astro";
+export { default as Carousel } from './Carousel.astro';
 export { default as CodeBlock } from "./CodeBlock.astro";
 export { default as Footer } from "./Footer.astro";
 export { default as Footnote } from "./Footnote.astro";

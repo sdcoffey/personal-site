@@ -6,9 +6,12 @@ heroImage: ../../assets/placeholder-hero.jpg
 draft: true
 ---
 
-import steve from "../../assets/ttc.jpeg";
+import tyler from "../../assets/ttc.jpeg";
+import steve from "../../assets/steve.jpg";
+import honeycomb from "../../assets/honeycomb.jpg";
+import placeholder from "../../assets/placeholder-hero.jpg";
 import { Image } from "astro:assets";
-import CodeBlock from "../../components/CodeBlock.astro";
+import { Carousel, CodeBlock } from "../../components";
 
 MDX is a special flavor of Markdown that supports embedded JavaScript & JSX syntax. This unlocks the ability to [mix JavaScript and UI Components into your Markdown content](https://docs.astro.build/en/guides/markdown-content/#mdx-features) for things like interactive charts or alerts.
 
@@ -20,12 +23,14 @@ If you have existing content authored in MDX, this integration will hopefully ma
 
 ## Example
 
+<Carousel images={[tyler, placeholder, { src: steve, caption: "some caption" }, honeycomb]} />
+
 <CodeBlock tabs={["mdx-sample/example.ts", "mdx-sample/example.rb", "mdx-sample/example-with-frontmatter.rb"]} />
 
 <CodeBlock tabs={["mdx-sample/bash-product.js"]} />
 
 <figure>
-  <Image src={steve} alt="Photo of Steve" format="webp" quality="med" class="h-64" />
+  <Image src={tyler} alt="Photo of Steve" format="webp" quality="med" />
   <figcaption>some caption</figcaption>
 </figure>
 

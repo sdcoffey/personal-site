@@ -1,0 +1,91 @@
+---
+import { Image } from "astro:assets";
+import type { ImgAttributes } from "astro:assets";
+
+type ImageProp = ImgAttributes | { src: ImgAttributes; caption: string };
+type Props = {
+  class?: string;
+  images: Array<ImageProp>;
+};
+
+function isImgAttributes(value: ImageProp): value is ImgAttributes {
+  return value["caption"] === undefined;
+}
+
+function ar(image: ImgAttributes): number {
+  return image.height / image.width;
+}
+
+function imageHeight(image: ImgAttributes): number {
+  if (ar(image) > 1) {
+    return 500 * ar(image);
+  } else {
+    return 500;
+  }
+}
+
+function imageWidth(image: ImgAttributes): number {
+  if (ar(image) > 1) {
+    return 500;
+  } else {
+    return 500 / ar(image);
+  }
+}
+---
+
+<div
+  class="carousel-container mx-auto my-20 flex w-min min-w-full flex-col gap-2 lg:min-w-[50ch]"
+  data-images={Astro.props.images.length}
+>
+  <div class="flex flex-row gap-2 px-0.5">
+    {Astro.props.images.map(() => <div class="carousel__indicator" />)}
+  </div>
+  <figure class="my-0">
+    <div class:list={["carousel", Astro.props.class]}>
+      {
+        Astro.props.images.map((image) =>
+          isImgAttributes(image) ? (
+            <Image src={image} format="webp" height={imageHeight(image)} width={imageWidth(image)} alt="carousel-img" />
+          ) : (
+            <Image
+              src={image.src}
+              format="webp"
+              height={imageHeight(image.src)}
+              width={imageWidth(image.src)}
+              alt={image.caption}
+            />
+          ),
+        )
+      }
+    </div>
+    <div class="my-4 flex h-5 flex-col overflow-y-scroll">
+      {
+        Astro.props.images.map((image, index) =>
+          isImgAttributes(image) ? (
+            <figcaption class="carousel__caption my-0 h-5">&nbsp;</figcaption>
+          ) : (
+            <figcaption class="carousel__caption my-0 h-5 text-center">{image.caption}</figcaption>
+          ),
+        )
+      }
+    </div>
+  </figure>
+</div>
+
+<style>
+  .carousel {
+    @apply flex flex-row rounded-xl border border-slate-400 shadow;
+    @apply aspect-square min-w-full max-w-full lg:max-w-lg;
+    @apply scrollbar-hidden snap-x snap-mandatory overflow-x-scroll;
+
+    img {
+      @apply m-0 h-full w-full min-w-full snap-start rounded-none object-cover object-center;
+    }
+  }
+
+  .carousel__indicator {
+    @apply h-[3px] rounded-full bg-black;
+  }
+</style>
+
+<script src="./carousel.ts"></script>

@@ -3,7 +3,6 @@ import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
 
 import FormattedDate from "./FormattedDate.astro";
-import MainLayout from "../layouts/MainLayout.astro";
 
 type Entry = CollectionEntry<"blog">["data"];
 type Props = Entry & {
@@ -16,7 +15,7 @@ const { slug, title, description, pubDate, heroImage, class: className } = Astro
 <a
   href={`/blog/${slug}`}
   class:list={[
-    "not-prose bg-slate-40 rounded-lg flex flex-col border border-slate-200 no-underline shadow transition hover:-translate-y-px hover:shadow-lg lg:max-w-[200px]",
+    "not-prose bg-slate-40 flex flex-col rounded-lg border border-slate-200 no-underline shadow transition hover:-translate-y-px hover:shadow-lg lg:max-w-[200px]",
     className,
   ]}
 >
@@ -38,7 +37,7 @@ const { slug, title, description, pubDate, heroImage, class: className } = Astro
 
   <div class="flex flex-shrink flex-col gap-4 p-4 pt-3">
     <FormattedDate date={pubDate} class="text-sm" />
-    <p class="line-clamp-2 font-light text-sm leading-tight text-slate-800">
+    <p class="line-clamp-2 text-sm font-light leading-tight text-slate-800">
       {description}
     </p>
   </div>
