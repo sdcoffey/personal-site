@@ -37,7 +37,13 @@ function imageSize(image: ImgAttributes): { height: number; width: number } {
       {
         Astro.props.images.map((image) =>
           isImgAttributes(image) ? (
-            <Image src={image} format="webp" height={imageHeight(image)} width={imageWidth(image)} alt="carousel-img" />
+            <Image
+              src={image}
+              format="webp"
+              height={imageSize(image).height}
+              width={imageSize(image).width}
+              alt="carousel-img"
+            />
           ) : (
             <Image
               src={image.src}
