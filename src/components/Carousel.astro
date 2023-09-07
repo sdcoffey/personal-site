@@ -16,19 +16,11 @@ function ar(image: ImgAttributes): number {
   return image.height / image.width;
 }
 
-function imageHeight(image: ImgAttributes): number {
+function imageSize(image: ImgAttributes): { height: number; width: number } {
   if (ar(image) > 1) {
-    return 500 * ar(image);
+    return { height: Math.round(500 * ar(image)), width: 500 };
   } else {
-    return 500;
-  }
-}
-
-function imageWidth(image: ImgAttributes): number {
-  if (ar(image) > 1) {
-    return 500;
-  } else {
-    return 500 / ar(image);
+    return { height: 500, width: Math.round(500 / ar(image)) };
   }
 }
 ---
@@ -50,8 +42,8 @@ function imageWidth(image: ImgAttributes): number {
             <Image
               src={image.src}
               format="webp"
-              height={imageHeight(image.src)}
-              width={imageWidth(image.src)}
+              height={imageSize(image.src).height}
+              width={imageSize(image.src).width}
               alt={image.caption}
               class:list={image.class}
             />
