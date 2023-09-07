@@ -60,9 +60,11 @@ containers.forEach((container) => {
       indicator.style.opacity = `${opacity}`;
     });
 
-    captions.forEach((caption) => {
+    captions.forEach((caption, index) => {
       const translateY = offset * captionHeight;
+      const opacity = interpolate(Math.abs(offset - index), [0, 1], [1, 0], "clamp");
       caption.style.transform = `translateY(${-translateY}px)`;
+      caption.style.opacity = `${opacity}`;
     });
   });
 });
