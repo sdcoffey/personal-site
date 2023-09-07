@@ -75,7 +75,7 @@ function imageSize(image: ImgAttributes): { height: number; width: number } {
   .carousel {
     @apply flex flex-row rounded-xl border border-slate-400 shadow;
     @apply aspect-square min-w-full max-w-full lg:max-w-lg;
-    @apply scrollbar-hidden snap-x snap-mandatory overflow-x-scroll;
+    @apply scrollbar-hidden snap-x snap-mandatory overflow-y-hidden overflow-x-scroll overscroll-y-none;
 
     img {
       @apply m-0 h-full w-full min-w-full snap-start rounded-none object-cover object-center;
