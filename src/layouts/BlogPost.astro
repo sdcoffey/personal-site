@@ -1,26 +1,31 @@
 ---
 import { Image, getImage } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
-import { Footnotes, Howler, FormattedDate } from "../components";
+import { GetImageResult } from "astro";
 
+import { Footnotes, Howler, FormattedDate } from "../components";
 import MainLayout from "../layouts/MainLayout.astro";
 
 type Props = CollectionEntry<"blog">["data"] & {
   headings: CollectionEntry<"blog">["headings"];
+  showHowler?: boolean;
 };
 
-const { title, description, pubDate, heroImage, heroImageCaption, headings } = Astro.props;
+const { title, description, pubDate, heroImage, heroImageCaption, headings, showHowler = true } = Astro.props;
 const filteredHeaders = headings.filter(({ depth }) => depth < 4);
 
-const metaImg = await getImage({ src: heroImage, format: "webp", height: 800, width: 1200 });
+let metaImg: GetImageResult | undefined = undefined;
+if (heroImage) {
+  metaImg = await getImage({ src: heroImage, format: "webp", height: 800, width: 1200 });
+}
 ---
 
-<MainLayout title={title} docTitle={title} docDescription={description} showNav={true} image={metaImg.src}>
+<MainLayout title={title} docTitle={title} docDescription={description} showNav={true} image={metaImg?.src}>
   <article class="padded-container article prose mx-auto prose-pre:rounded-sm prose-pre:bg-slate-200 prose-pre:p-1">
     <h1 class="page-title mb-2">{title}</h1>
-    <h4>{description}</h4>
+    {description && <h4>{description}</h4>}
 
-    <FormattedDate date={pubDate} class="text-sm" />
+    {pubDate && <FormattedDate date={pubDate} class="text-sm" />}
     {
       heroImage && (
         <figure class="my-12">
@@ -43,7 +48,7 @@ const metaImg = await getImage({ src: heroImage, format: "webp", height: 800, wi
     {!heroImage && <hr />}
     <div class="article-content">
       <slot />
-      <Howler />
+      {showHowler && <Howler />}
       <Footnotes />
     </div>
 
@@ -103,88 +108,6 @@ const metaImg = await getImage({ src: heroImage, format: "webp", height: 800, wi
     &:before {
       @apply absolute inset-y-0 left-0 h-full w-0.5 bg-slate-300 transition;
       content: " ";
-    }
-  }
-
-  .article-content {
-    .astro-code {
-      @apply !my-6 !rounded-lg !bg-slate-800 !p-4;
-      @apply !text-xs lg:!text-sm;
-    }
-
-    details {
-      @apply rounded-lg border border-slate-300 bg-slate-100 p-4 text-sm shadow-sm;
-
-      p:last-child {
-        @apply mb-0;
-      }
-      summary {
-        @apply text-base font-semibold text-slate-700;
-        @apply cursor-pointer;
-      }
-    }
-
-    ol,
-    ul {
-      li {
-        @apply m-0;
-      }
-
-      ol {
-        @apply m-0;
-      }
-    }
-
-    .header-caption {
-      @apply text-sm font-semibold text-slate-500;
-    }
-
-    h1,
-    h2,
-    h3,
-    h4 {
-      &:has(+ .header-caption) {
-        @apply mb-0;
-      }
-    }
-
-    #in-this-post + ul {
-      @apply flex list-none flex-col gap-2 pl-0;
-
-      ul {
-        @apply m-0 list-none;
-      }
-
-      a,
-      p {
-        @apply m-0 text-sm font-normal leading-tight;
-      }
-
-      li {
-        @apply m-0 p-0;
-      }
-
-      ul {
-        @apply flex flex-col gap-0;
-      }
-    }
-
-    img {
-      @apply mx-auto mt-12 w-auto rounded-lg object-contain shadow-sm;
-
-      & ~ figcaption {
-        @apply text-center text-sm text-slate-500;
-
-        a {
-          @apply font-normal text-slate-500;
-        }
-      }
-    }
-
-    .scrollable-code {
-      pre {
-        @apply max-h-[60vh] overflow-y-scroll lg:max-h-[700px];
-      }
     }
   }
 </style>

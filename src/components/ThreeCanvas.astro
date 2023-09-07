@@ -1,0 +1,12 @@
+---
+type Props = {
+  script: string;
+  class?: string;
+};
+
+const canvasId = `three-canvas--${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div id={canvasId} class:list={["three-canvas", Astro.props.class]}></div>
+
+<slot />

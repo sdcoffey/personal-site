@@ -1,0 +1,19 @@
+---
+type Props = {
+  label: string;
+  skills: Array<string>;
+};
+---
+
+<div class="flex flex-col">
+  <h3 class="mb-1">{Astro.props.label}</h3>
+  <div class="flex flex-row flex-wrap gap-2">
+    {
+      Astro.props.skills.map((skill) => (
+        <p class="not-prose my-0 h-fit rounded-lg border border-slate-300 bg-slate-100 px-2 py-1 text-sm font-semibold text-slate-700 shadow-sm">
+          {skill}
+        </p>
+      ))
+    }
+  </div>
+</div>

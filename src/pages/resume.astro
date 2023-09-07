@@ -1,10 +1,10 @@
 ---
 import MainLayout from "../layouts/MainLayout.astro";
+
+import { Content, getHeadings } from "../mdx-content/resume.mdx";
+import BlogPost from "../layouts/BlogPost.astro";
 ---
 
-<MainLayout showNav={true} title="My Resume">
-  <article class="padded-container">
-    <h1 class="page-title">The Resume</h1>
-      <h2></h2>
-  </article>
-</MainLayout>
+<BlogPost title="The Resume" headings={getHeadings()} showHowler={false}>
+  <Content />
+</BlogPost>

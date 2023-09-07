@@ -25,6 +25,90 @@
     }
   }
 
+  .article-content {
+    .astro-code {
+      @apply !my-6 !rounded-lg !bg-slate-800 !p-4;
+      @apply !text-xs lg:!text-sm;
+    }
+
+    details {
+      @apply rounded-lg border border-slate-300 bg-slate-100 p-4 text-sm shadow-sm;
+
+      p:last-child {
+        @apply mb-0;
+      }
+      summary {
+        @apply text-base font-semibold text-slate-700;
+        @apply cursor-pointer;
+      }
+    }
+
+    ol,
+    ul {
+      @apply marker:text-slate-800;
+
+      li {
+        @apply m-0;
+      }
+
+      ol, ul {
+        @apply m-0;
+      }
+    }
+
+    .header-caption {
+      @apply text-sm font-semibold text-slate-500;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      &:has(+ .header-caption) {
+        @apply mb-0;
+      }
+    }
+
+    #in-this-post + ul {
+      @apply flex list-none flex-col gap-2 pl-0;
+
+      ul {
+        @apply m-0 list-none;
+      }
+
+      a,
+      p {
+        @apply m-0 text-sm font-normal leading-tight;
+      }
+
+      li {
+        @apply m-0 p-0;
+      }
+
+      ul {
+        @apply flex flex-col gap-0;
+      }
+    }
+
+    img {
+      @apply mx-auto mt-12 w-auto rounded-lg object-contain shadow-sm;
+
+      & ~ figcaption {
+        @apply text-center text-sm text-slate-500;
+
+        a {
+          @apply font-normal text-slate-500;
+        }
+      }
+    }
+
+    .scrollable-code {
+      pre {
+        @apply max-h-[60vh] overflow-y-scroll lg:max-h-[700px];
+      }
+    }
+  }
+
   .padded-container {
     & > * {
       @apply px-6 lg:px-0;
