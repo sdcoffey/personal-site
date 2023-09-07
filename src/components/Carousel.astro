@@ -2,14 +2,14 @@
 import { Image } from "astro:assets";
 import type { ImgAttributes } from "astro:assets";
 
-type ImageProp = ImgAttributes | { src: ImgAttributes; caption: string };
+type ImageProp = ImgAttributes | { src: ImgAttributes; caption?: string; class?: string };
 type Props = {
   class?: string;
   images: Array<ImageProp>;
 };
 
 function isImgAttributes(value: ImageProp): value is ImgAttributes {
-  return value["caption"] === undefined;
+  return value["height"] !== undefined && value["width"] !== undefined;
 }
 
 function ar(image: ImgAttributes): number {
@@ -53,12 +53,13 @@ function imageWidth(image: ImgAttributes): number {
               height={imageHeight(image.src)}
               width={imageWidth(image.src)}
               alt={image.caption}
+              class:list={image.class}
             />
           ),
         )
       }
     </div>
-    <div class="my-4 flex h-5 flex-col overflow-y-scroll">
+    <div class="my-2 flex h-5 flex-col overflow-y-scroll">
       {
         Astro.props.images.map((image, index) =>
           isImgAttributes(image) ? (
