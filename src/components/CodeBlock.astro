@@ -1,10 +1,11 @@
 ---
-import fs from 'fs';
-import path from 'path'
-import fm from 'front-matter';
-import { joinToProjectRoot } from "../utilities";
+import fs from "fs";
+import path from "path";
+import fm from "front-matter";
+import { Code } from "astro/components";
 
-import { Code } from 'astro/components';
+import { joinToProjectRoot } from "../utilities";
+import { Clipboard, Checkmark } from "../assets/icons";
 
 type Tab = {
   bash?: string;
@@ -13,21 +14,26 @@ type Tab = {
   code: string;
   language: string;
   class: string;
-}
+};
 
 type Props = {
   tabs: Array<Tab | string>;
 };
 
-
-function readTab(tab: Tab | string): { class: string, filename: string, code: string, language: string, copyable: boolean } {
+function readTab(tab: Tab | string): {
+  class: string;
+  filename: string;
+  code: string;
+  language: string;
+  copyable: boolean;
+} {
   if (typeof tab === "string") {
-    const filepath = joinToProjectRoot('snippets', tab)
+    const filepath = joinToProjectRoot("snippets", tab);
     const src = fs.readFileSync(filepath, "utf-8");
     const ext = path.extname(tab).replace(".", "");
 
     if (fm.test(src)) {
-      type Attributes = { class?: string, filename?: string, language?: string, bash?: string, copyable?: boolean }
+      type Attributes = { class?: string; filename?: string; language?: string; bash?: string; copyable?: boolean };
       const { attributes, body } = fm(src);
       return {
         class: attributes.class ?? "",
@@ -35,11 +41,11 @@ function readTab(tab: Tab | string): { class: string, filename: string, code: st
         filename: attributes.filename,
         code: body,
         language: attributes.language ?? ext,
-        copyable: attributes.copyable ?? false
+        copyable: attributes.copyable ?? false,
       };
     }
 
-    return { filename: path.basename(tab), code: src, language: ext, copyable: false, class: "" }
+    return { filename: path.basename(tab), code: src, language: ext, copyable: false, class: "" };
   } else {
     if (!tab.filename || !tab.code || !tab.language) {
       throw new Error("Missing filename, code, or language");
@@ -50,7 +56,7 @@ function readTab(tab: Tab | string): { class: string, filename: string, code: st
       filename: tab.filename,
       code: tab.code,
       language: tab.language,
-      copyable: tab.copyable ?? false
+      copyable: tab.copyable ?? false,
     };
   }
 }
@@ -64,7 +70,10 @@ const { tabs } = Astro.props;
   >
     {
       tabs.map((tab) => (
-        <div data-filename={readTab(tab).filename} class:list={["code-tabs-container__tab", { "no-underline": tabs.length === 1}]}>
+        <div
+          data-filename={readTab(tab).filename}
+          class:list={["code-tabs-container__tab", { "no-underline": tabs.length === 1 }]}
+        >
           {readTab(tab).filename}
         </div>
       ))
@@ -78,24 +87,25 @@ const { tabs } = Astro.props;
           <div class="code-tabs-container__code-container" data-filename={filename}>
             {bash && (
               <div>
-                  <Code lang="bash" code={`$ ${bash.trim()}`} class="border border-b" />
-                  <div class="flex flex-row gap-2 items-center !my-0 !py-0 bg-slate-800">
-                    <hr class="border-slate-700 my-0 w-8 flex-shrink-0" />
-                    <p class="my-0 text-slate-600 text-xs font-mono">Output</p>
-                      <hr class="border-slate-700 my-0 w-12 grow" />
-                  </div>
+                <Code lang="bash" code={`$ ${bash.trim()}`} class="border border-b" />
+                <div class="!my-0 flex flex-row items-center gap-2 bg-slate-800 !py-0">
+                  <hr class="my-0 w-8 flex-shrink-0 border-slate-700" />
+                  <p class="my-0 font-mono text-xs text-slate-600">Output</p>
+                  <hr class="my-0 w-12 grow border-slate-700" />
+                </div>
               </div>
             )}
-            <div class:list={[cls, { "code-rounded-b-lg": true } ]}>
+            <div class:list={[cls, { "code-rounded-b-lg": true }]}>
               {!bash && copyable && (
                 <button data-code-copy-button data-code-copy-content={code} class="code-tabs-container__copy-button">
-                    Copy
+                  <Clipboard class="code-tabs-container__copy-button__clipboard h-5 w-5 text-slate-50" />
+                  <Checkmark class="code-tabs-container__copy-button__checkmark hidden h-5 w-5" />
                 </button>
               )}
               <Code lang={language} code={code.trim()} />
             </div>
           </div>
-        )
+        );
       })
     }
   </div>
@@ -106,9 +116,17 @@ const { tabs } = Astro.props;
     @apply my-8 flex flex-col;
 
     &__copy-button {
-      @apply absolute right-3 top-3 rounded border border-slate-600 bg-slate-800/20 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm;
+      @apply absolute right-3 top-3 rounded border border-slate-600 bg-slate-800/20 px-2 py-2 text-xs font-medium text-white backdrop-blur-sm;
       @apply transition hover:border-slate-500 hover:bg-slate-700/20 hover:underline;
       @apply shadow-inner active:bg-slate-800;
+
+      &--selected {
+        @apply border-emerald-500 bg-emerald-500/20 hover:border-emerald-500 hover:bg-emerald-500/20;
+
+        svg {
+          @apply text-emerald-500;
+        }
+      }
     }
 
     &__code-container {
@@ -125,7 +143,7 @@ const { tabs } = Astro.props;
       }
 
       pre.astro-code {
-        @apply !my-0 !rounded-t-none !rounded-b-none;
+        @apply !my-0 !rounded-b-none !rounded-t-none;
       }
     }
 
@@ -170,21 +188,27 @@ const { tabs } = Astro.props;
     });
 
     selectTab(tabs[0].dataset.filename);
+  });
 
-    const copyButtons = document.querySelectorAll("[data-code-copy-button]");
-    copyButtons.forEach((b) => {
-      b.addEventListener("click", () => {
-        try {
-          const code = b.dataset.codeCopyContent;
-          navigator.clipboard.writeText(code.trim());
-          b.innerText = "Copied!";
-          setTimeout(() => {
-            b.innerText = "Copy";
-          }, 2000);
-        } catch (e) {
-          console.error(e);
-        }
-      });
+  const copyButtons = document.querySelectorAll("[data-code-copy-button]") as NodeListOf<HTMLButtonElement>;
+  copyButtons.forEach((b: HTMLButtonElement) => {
+    b.addEventListener("click", (e) => {
+      try {
+        const code = b.dataset.codeCopyContent;
+        navigator.clipboard.writeText(code.trim());
+
+        b.classList.toggle("code-tabs-container__copy-button--selected", true);
+        b.querySelector(".code-tabs-container__copy-button__clipboard").classList.toggle("hidden", true);
+        b.querySelector(".code-tabs-container__copy-button__checkmark").classList.toggle("hidden", false);
+
+        setTimeout(() => {
+          b.classList.toggle("code-tabs-container__copy-button--selected", false);
+          b.querySelector(".code-tabs-container__copy-button__clipboard").classList.toggle("hidden", false);
+          b.querySelector(".code-tabs-container__copy-button__checkmark").classList.toggle("hidden", true);
+        }, 2000);
+      } catch (e) {
+        console.error(e);
+      }
     });
   });
 </script>
