@@ -5,7 +5,7 @@ import fm from "front-matter";
 import { Code } from "astro/components";
 
 import { joinToProjectRoot } from "../utilities";
-import { Clipboard, Checkmark } from "../assets/icons";
+import { Square2Stack, Checkmark } from "../assets/icons";
 
 type Tab = {
   bash?: string;
@@ -98,7 +98,7 @@ const { tabs } = Astro.props;
             <div class:list={[cls, { "code-rounded-b-lg": true }]}>
               {!bash && copyable && (
                 <button data-code-copy-button data-code-copy-content={code} class="code-tabs-container__copy-button">
-                  <Clipboard class="code-tabs-container__copy-button__clipboard" />
+                  <Square2Stack class="code-tabs-container__copy-button__clipboard" />
                   <Checkmark class="code-tabs-container__copy-button__checkmark" />
                 </button>
               )}
