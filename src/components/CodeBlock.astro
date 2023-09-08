@@ -98,8 +98,8 @@ const { tabs } = Astro.props;
             <div class:list={[cls, { "code-rounded-b-lg": true }]}>
               {!bash && copyable && (
                 <button data-code-copy-button data-code-copy-content={code} class="code-tabs-container__copy-button">
-                  <Clipboard class="code-tabs-container__copy-button__clipboard h-5 w-5 text-slate-50" />
-                  <Checkmark class="code-tabs-container__copy-button__checkmark hidden h-5 w-5" />
+                  <Clipboard class="code-tabs-container__copy-button__clipboard" />
+                  <Checkmark class="code-tabs-container__copy-button__checkmark" />
                 </button>
               )}
               <Code lang={language} code={code.trim()} />
@@ -120,11 +120,26 @@ const { tabs } = Astro.props;
       @apply transition hover:border-slate-500 hover:bg-slate-700/20 hover:underline;
       @apply shadow-inner active:bg-slate-800;
 
+      svg {
+        @apply h-5 w-5 text-slate-50;
+
+        &:nth-child(2) {
+          @apply hidden;
+        }
+      }
+
       &--selected {
         @apply border-emerald-500 bg-emerald-500/20 hover:border-emerald-500 hover:bg-emerald-500/20;
 
         svg {
           @apply text-emerald-500;
+
+          &:first-child {
+            @apply hidden;
+          }
+          &:nth-child(2) {
+            @apply block;
+          }
         }
       }
     }
@@ -198,13 +213,9 @@ const { tabs } = Astro.props;
         navigator.clipboard.writeText(code.trim());
 
         b.classList.toggle("code-tabs-container__copy-button--selected", true);
-        b.querySelector(".code-tabs-container__copy-button__clipboard").classList.toggle("hidden", true);
-        b.querySelector(".code-tabs-container__copy-button__checkmark").classList.toggle("hidden", false);
 
         setTimeout(() => {
           b.classList.toggle("code-tabs-container__copy-button--selected", false);
-          b.querySelector(".code-tabs-container__copy-button__clipboard").classList.toggle("hidden", false);
-          b.querySelector(".code-tabs-container__copy-button__checkmark").classList.toggle("hidden", true);
         }, 2000);
       } catch (e) {
         console.error(e);
