@@ -18,3 +18,7 @@ export function projectRootPath(): string {
 export function joinToProjectRoot(...parts: string[]): string {
   return path.join(projectRootPath(), ...parts);
 }
+
+export function id(): string {
+  return Math.random().toString(36).slice(2, 9);
+}
