@@ -63,7 +63,7 @@ In this way, you can think of an importmap for the browser as serving the same f
 
 Here's the same script above rewritten for the browser, using importmaps.
 
-<CodeBlock tabs={["esmodules/html-with-module.html", "esmodules/mjs-with-cjs-import.js"]} />
+<CodeBlock tabs={["esmodules/html-with-module.html"]} />
 
 <details>
     <summary>What's going on here?</summary>
@@ -71,7 +71,8 @@ Here's the same script above rewritten for the browser, using importmaps.
     In our html doc, we've declared two script tags, one with `type="importmap"`, and one with `type="module"`.
     When the browser parses the second script tag, it will download and execute `module.mjs`.
 
-    As it begins to parse `module.mjs`, the first statement the interpreter will come across is an import of the `merge` function from `lodash`.
+    As it begins to parse the second script tag, the first statement the interpreter will come across is an import of
+    lodash as `_` from the named package, `lodash`.
     Because `lodash` is not an absolute or relative import, it will refer to the importmap to resolve the module.
 
     Having resolved `lodash` to `https://esm.sh/lodash@4.17.21`, it will fetch the module, and continue executing `module.mjs`.

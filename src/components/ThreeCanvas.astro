@@ -5,4 +5,18 @@ type Props = {
 };
 ---
 
-<div id={Astro.props.id} class:list={["three-canvas", Astro.props.class]}></div>
+<div id={Astro.props.id} class:list={["three-canvas", Astro.props.class]}>
+  {
+    Astro.slots.has("default") && (
+      <div class="not-prose absolute inset-0 p-3">
+        <slot />
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .three-canvas {
+    @apply relative h-[500px] w-full overflow-hidden rounded-lg border border-slate-400;
+  }
+</style>

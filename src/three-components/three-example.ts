@@ -1,12 +1,6 @@
-import {
-  DirectionalLight,
-  Group,
-  Mesh,
-  MeshPhongMaterial,
-  OrthographicCamera,
-  SphereGeometry,
-  WebGLRenderer,
-} from "three";
+import { NaiveBroadphase, World } from "cannon";
+import { DirectionalLight, PerspectiveCamera, WebGLRenderer } from "three";
+import Atom from "./Atom.ts";
 import mount from "./mount-three.ts";
 
 document.querySelectorAll(".three-canvas.three-example").forEach((canvas) => {
@@ -14,26 +8,26 @@ document.querySelectorAll(".three-canvas.three-example").forEach((canvas) => {
     canvas,
     (scene, camera, renderer) => {
       renderer.setClearColor("#fff", 0);
+      const world = new World();
+      world.broadphase = new NaiveBroadphase(world);
+      world.solver.iterations = 10;
 
-      function createParticle(type: "proton" | "neutron"): Mesh {
-        const geo = new SphereGeometry(40, 50, 50);
-        const material = new MeshPhongMaterial({ color: type === "proton" ? "#abcdef" : "#fff" });
-        return new Mesh(geo, material);
-      }
-
-      const proton = createParticle("proton");
-      const neutron = createParticle("neutron");
       const topLight = new DirectionalLight(0xffffff, 3); // soft white light
-      const bottomLight = new DirectionalLight(0xffffff, 1); // soft white light
-      // const lightHelper = new PointLightHelper(light, 1);
+      topLight.castShadow = true;
+      topLight.shadow.radius = 10;
+      topLight.shadow.mapSize.width = 1024;
+      topLight.shadow.mapSize.height = 1024;
       topLight.position.set(2, 2, 2);
-      bottomLight.position.set(-2, -2, 2);
-      neutron.position.set(-50, 0, 0);
-      const group = new Group();
-      group.add(proton);
-      group.add(neutron);
 
-      scene.add(group);
+      const bottomLight = new DirectionalLight(0xffffff, 1); // soft white light
+      bottomLight.castShadow = true;
+      bottomLight.shadow.radius = 10;
+      bottomLight.shadow.mapSize.width = 1024;
+      bottomLight.shadow.mapSize.height = 1024;
+      bottomLight.position.set(0, 0, 2);
+
+      const hydrogen = new Atom(92, 146, world);
+      scene.add(hydrogen.nucleus);
 
       scene.add(topLight);
       scene.add(bottomLight);
@@ -41,22 +35,28 @@ document.querySelectorAll(".three-canvas.three-example").forEach((canvas) => {
       function animate() {
         requestAnimationFrame(animate);
 
-        group.rotation.x += 0.01;
-        group.rotation.y += 0.01;
+        hydrogen.nucleus.rotation.x += 0.005;
+        hydrogen.nucleus.rotation.y += 0.0;
+        hydrogen.animate();
+        world.step(1 / 60);
+        hydrogen.update();
 
         renderer.render(scene, camera);
       }
 
+      world.gravity.set(0, 0, 0);
       animate();
     },
     {
       createCamera: (width, height) => {
-        const cam = new OrthographicCamera(width / -2, width / 2, height / 2, height / -2, -1000, 1000);
-        cam.position.z = 2;
+        const cam = new PerspectiveCamera(50, width / height, 0.01, 1000);
+        cam.position.z = 30;
         return cam;
       },
       createRenderer: () => {
-        return new WebGLRenderer({ antialias: true, alpha: true });
+        const renderer = new WebGLRenderer({ antialias: true, alpha: true });
+        renderer.shadowMap.enabled = true;
+        return renderer;
       },
     },
   );

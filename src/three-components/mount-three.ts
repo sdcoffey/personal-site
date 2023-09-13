@@ -14,6 +14,7 @@ export default function mount(element: Element, cb: AfterMountCallback, options?
   const camera = options?.createCamera?.(width, height) ?? new PerspectiveCamera(75, width / height, 0.1, 1000);
 
   const renderer = options?.createRenderer?.() ?? new WebGLRenderer();
+  renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(width, height);
   element.appendChild(renderer.domElement);
 
@@ -21,6 +22,7 @@ export default function mount(element: Element, cb: AfterMountCallback, options?
   renderer.render(scene, camera);
 
   element.addEventListener("resize", () => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    const { height, width } = element.getBoundingClientRect();
+    renderer.setSize(height, width);
   });
 }

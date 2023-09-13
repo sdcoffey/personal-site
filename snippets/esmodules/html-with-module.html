@@ -9,5 +9,11 @@ filename: index.html
       }
     }
   </script>
-  <script type="module" src="/module.mjs"></script>
+  <script type="module">
+    import _ from "lodash";
+
+    function addPi(target) {
+      return _.merge(target, { pi: 3.14 });
+    }
+  </script>
 </head>

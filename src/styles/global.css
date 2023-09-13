@@ -118,8 +118,4 @@
       }
     }
   }
-
-  .three-canvas {
-    @apply h-[500px] w-full rounded-lg overflow-hidden border-slate-400 border;
-  }
 }
