@@ -10,12 +10,12 @@ import ac1 from "../../assets/assetclass/personalized-updates.png";
 import ac2 from "../../assets/assetclass/portfolio-view.png";
 import ac3 from "../../assets/assetclass/web_1184.png";
 
-import factorHomepage from '../../assets/factor/homepage.png';
-import factorView from '../../assets/factor/view-with-sql.png';
-import factorNew from '../../assets/factor/new-query.png';
+import factorHomepage from "../../assets/factor/homepage.png";
+import factorView from "../../assets/factor/view-with-sql.png";
+import factorNew from "../../assets/factor/new-query.png";
 
-import welltrava from '../../assets/trava/welltrava.png'
-import wetrava from '../../assets/trava/wetrava.png'
+import welltrava from "../../assets/trava/welltrava.png";
+import wetrava from "../../assets/trava/wetrava.png";
 
 import { Carousel, Footnote } from "../../components";
 
@@ -46,7 +46,6 @@ Young, self-directed investors with a fragmented set of investment accounts lack
 Enter AssetClass: an easy-to-use app that tracks all of your investment accounts in one place and makes smart recommendations
 to help you get the most out of your savings.
 
-
 <Carousel
   images={[
     { src: ac2, caption: "See your portfolio at a glance", class: "!object-contain !object-bottom px-4 bg-white" },
@@ -63,22 +62,25 @@ We [launched AssetClass](https://www.producthunt.com/products/assetclass#assetcl
 the product to over 1500 users–initially good traction! After 4-5 months investment, however, we decided to pivot.
 
 <details>
-  <summary>AssetClass's tech stack</summary>
-  We used a really straightfoward, server-driven stack to build AssetClass:
+<summary>AssetClass's tech stack</summary>
+We used a really straightfoward, server-driven stack to build AssetClass:
 
-  **Internal:**
-  1. **Rails** for server rendering, database management, background jobs
-  1. **Postgres**
-  1. **Stimulus** for interactivity
-  1. **Tailwind** for styling
-  1. **Turbo-native** for mobile
+**Internal:**
 
-  **External:**
-  1. Finicity for most financial account connections
-  1. Plaid for certain connections, like Robinhood
-  1. Alchemy for blockchain integrations
-  1. Coinbase for crypto prices
-  1. Polygon for security prices
+1. **Rails** for server rendering, database management, background jobs
+1. **Postgres**
+1. **Stimulus** for interactivity
+1. **Tailwind** for styling
+1. **Turbo-native** for mobile
+
+**External:**
+
+1. Finicity for most financial account connections
+1. Plaid for certain connections, like Robinhood
+1. Alchemy for blockchain integrations
+1. Coinbase for crypto prices
+1. Polygon for security prices
+
 </details>
 
 ### Headwinds
@@ -97,7 +99,7 @@ incredible hit of dopamine that comes with the knowledge that you're a bit riche
 Our users weren't professional investors–they weren't getting paid to watch the market. So what did they do when the dopamine dried up?
 They stopped looking. Our engagement plummeted alongside the S&P 500.
 
-#### Technical infeasibility: Poor data quality
+#### Technical infeasibility
 
 **Poor data quality**
 
@@ -145,27 +147,32 @@ we set off to build essentially a clone of Dune with financial data like stock p
 
 <details>
   <summary>Factor's tech stack</summary>
-  **Internal:**
-  1. **Rails** for internal API, data modeling, background jobs, etc.
-  1. Two **Postgres** instances, one for application data, and a warehouse for financial data
-  1. **React** for client-rendering
-  1. **Tailwind** for styling
+**Internal:**
+1. **Rails** for internal API, data modeling, background jobs, etc.
+1. Two **Postgres** instances, one for application data, and a warehouse for financial data
+1. **React** for client-rendering
+1. **Tailwind** for styling
 
-  **External:**
-  1. Coinbase for crypto prices
-  1. Polygon for security prices
-  1. FRED for public economic data
+**External:**
+
+1. Coinbase for crypto prices
+1. Polygon for security prices
+1. FRED for public economic data
+
 </details>
 
-<Carousel images={[
-  { src: factorHomepage, caption: "Factor.fyi homepage", class: "!object-contain bg-black" },
-  { src: factorView, caption: "Viewing a query written in SQL", class: "!object-contain bg-black" },
-  { src: factorNew,  caption: "Creating a new query", class: "!object-contain bg-black" } ]}
+<Carousel
+  images={[
+    { src: factorHomepage, caption: "Factor.fyi homepage", class: "!object-contain bg-black" },
+    { src: factorView, caption: "Viewing a query written in SQL", class: "!object-contain bg-black" },
+    { src: factorNew, caption: "Creating a new query", class: "!object-contain bg-black" },
+  ]}
 />
 
 ### Headwinds
 
 #### No real problem to be solved
+
 Although I personally loved this product, there just weren't that many people out there who can both write SQL and care
 a lot about getting nitty-gritty analyses that they wouldn't be able to get someplace else for less effort. Even though we got
 , and continue to get, many signups, we had very few active users and essentially zero query authors on the platform.
@@ -175,13 +182,14 @@ a lot about getting nitty-gritty analyses that they wouldn't be able to get some
 We assumed that Dune's users had been regular folks, but we missed one key insight: Dune's paying users were blockchain developers who
 were using Dune as a monitoring tool for their own projects, not outside investors using it as a research tool, as we had assumed.
 That assumption had led us to believe that there were far more regular folks out there with the ability to write SQL
-than there actually are. The choice of interface, although interesting and flexibly, didn't resonate with our target market of
+than there actually are. The choice of interface, although interesting and flexible, didn't resonate with our target market of
 "protail" investors, researchers, and fintwit content creators.
 
 We later added some targeted features for financial content creators, like the ability to embed interactive charts in places like Medium and
 Substack, but the fundamental problem still existed: we weren't solving a real problem for anyone.
 
 ## [Yuzu](https://web.archive.org/web/20221201135955/https://www.yuzu.dev/)
+
 <p class="header-caption">May 2022 - Dec 2022</p>
 
 When we realized that Factor was looking a bit more like a passion project than a real business, we took a beat
@@ -192,25 +200,24 @@ wasn't a good idea to try to outdo Plaid or Finicity (we didn't think we could d
 the prices of stocks, bonds, options, etc. We understood from building two fintech apps that building with this data comes with a number of unique challenges, including:
 
 1. **Inefficient APIs:** All financial data APIs out there are built on the REST paradigm, which exposes a fixed
-schema by which you receive data. If you're building an app or website, you might need to call multiple API endpoints to grab all the data you need
-to render a screen, creating a noticeable drag on performance. Most companies will choose to "scrape" all of this data into their own database
-in order to create an internal API more tailored to their own internal use cases.
+   schema by which you receive data. If you're building an app or website, you might need to call multiple API endpoints to grab all the data you need
+   to render a screen, creating a noticeable drag on performance. Most companies will choose to "scrape" all of this data into their own database
+   in order to create an internal API more tailored to their own internal use cases.
 1. **Cache invalidation:** because most companies choose to do the above, they run into issues with stale data. Financial data, especially in equity markets,
-are incredibly dynamic. There are multiple events that can force you to rewrite entire tables unless modeled correctly:
-    1. **Dynamic symbology:** Stock tickers change on a daily basis. `COIN` might mean `Converted Organics, Inc.` one day and `Coinbase Global, Inc.` the next (yes this is real).
-    1. **Stock splits**: When a stock splits, all of the prices previous to the split must be "split-adjusted." For example, if `APPL` is trading at $100 one day,
-and the following day splits 5-1, it will start trading the following day at $20. To avoid the price appearing to jump from $100 to $20, you must adjust the previous days' prices
-to reflect the 5-1 split.
+   are incredibly dynamic. There are multiple events that can force you to rewrite entire tables unless modeled correctly: 1. **Dynamic symbology:** Stock tickers change on a daily basis. `COIN` might mean `Converted Organics, Inc.` one day and `Coinbase Global, Inc.` the next (yes this is real). 1. **Stock splits**: When a stock splits, all the prices previous to the split must be "split-adjusted." For example, if `APPL` is trading at $100 one day,
+   and the following day splits 5-1, it will start trading the following day at $20. To avoid the price appearing to jump from $100 to $20, you must adjust the previous days' prices
+   to reflect the 5-1 split.
 1. **Bandwidth constraints:** Most providers will put a cap on the number of streaming connections you're allowed to create, generally somewhere in the
-single digits. If you want to stream live prices to your clients, you have to proxy that stream and rebroadcast it out to your clients,
-which can be a big lift for a startup.
+   single digits. If you want to stream live prices to your clients, you have to proxy that stream and rebroadcast it out to your clients,
+   which can be a big lift for a startup.
 
 We solved these problems with two key product innovations:
+
 1. **GraphQL and SQL APIs:** GraphQL and SQL are both incredible ways to grab data in a flexible manner. They are really two sides
-of the same philosophy, with GraphQL generally being a frontend tool, and SQL a backend tool. Offering both APIs offered customers
-the ability to flexibly grab data to quickly build MVPs of products without needing to build their own cache of financial data.
+   of the same philosophy, with GraphQL generally being a frontend tool, and SQL a backend tool. Offering both APIs offered customers
+   the ability to flexibly grab data to quickly build MVPs of products without needing to build their own cache of financial data.
 2. **Unlimited websockets:** Leveraging newer technologies like Elixir allowed us to build scalable services that could
-serve a huge number of downstream clients.
+   serve a huge number of downstream clients.
 
 ### Successes
 
@@ -223,19 +230,16 @@ own Postgres frontend (replacing pgbouncer) to scale the number of clients that 
 <details>
   <summary>Yuzu's tech stack</summary>
 
-  1. **Rails** to manage our application database (customers, usage, metrics, etc), and schedule background jobs
-    to perform bulk ingestion of OHLCV data for stocks and crypto on a regular cadence (generally every 30 minutes).
-  1. **Postgres** for our application database.
-  1. **TimescaleDB** for our time-series data warehouse
-  1. **Golang** for two services:
-      1. One which ingested real-time crypto data from Coinbase, Binance US., and Binance International, rolled that
-  data up into 1-second bars, and sent it to the Rails app via WebSocket for warehousing.
-      1. A replacement for pgbouncer which was able to better handle per-user authorization.
-  1. **Node + Typescript** for the GraphQL API.
-  1. **Elixir + Phoenix** for two services:
-      1. One which ingested delayed the SIP feed, every trade and quote from all U.S. exchanges, rolled that data up into
-      1-second bars, and sent it to the Rails app via WebSocket for warehousing.
-      1. One to handle inbound websocket connections from clients.
+1. **Rails** to manage our application database (customers, usage, metrics, etc), and schedule background jobs
+   to perform bulk ingestion of OHLCV data for stocks and crypto on a regular cadence (generally every 30 minutes).
+1. **Postgres** for our application database.
+1. **TimescaleDB** for our time-series data warehouse
+1. **Golang** for two services: 1. One which ingested real-time crypto data from Coinbase, Binance US., and Binance International, rolled that
+   data up into 1-second bars, and sent it to the Rails app via WebSocket for warehousing. 1. A replacement for pgbouncer which was able to better handle per-user authorization.
+1. **Node + Typescript** for the GraphQL API.
+1. **Elixir + Phoenix** for two services: 1. One which ingested delayed the SIP feed, every trade and quote from all U.S. exchanges, rolled that data up into
+   1-second bars, and sent it to the Rails app via WebSocket for warehousing. 1. One to handle inbound websocket connections from clients.
+
 </details>
 
 After getting rejected from YC on this idea, we took stock of our progress. Several months work with several customers,
@@ -249,6 +253,7 @@ to justify a venture-scale business in the space, which could explain the percei
 done more research and not been as myopic about the problem space, we could have invalidated this idea from the jump.
 
 ## Trava
+
 <p class="header-caption">Jan 2023 - Sept 2023</p>
 
 After winding down Yuzu at the end of 2022, we really went back to the drawing board. With every industry on the table,
@@ -275,17 +280,24 @@ acquire customers cheaply by bidding on keywords that bigger travel players were
 <details>
   <summary>Trava's tech stack</summary>
 
-  1. **Rails**
-  1. **Postgres**
-  1. **Preact** for interactivity
-  1. **Tailwind** for styling
-  1. [**ES Modules and import maps**](/blog/esmodules-importmaps-modern-js-stack/) for js delivery
+1. **Rails**
+1. **Postgres**
+1. **Preact** for interactivity
+1. **Tailwind** for styling
+1. [**ES Modules and import maps**](/blog/esmodules-importmaps-modern-js-stack/) for js delivery
+
 </details>
 
-<Carousel images={[
-  {src: wetrava, caption: "Trava's first iteration - hotel search and booking", class: "!object-contain bg-black" },
-  {src: welltrava, caption: "Trava's second iteration - AI powered travel planning", class: "!object-contain bg-black" },
-]} />
+<Carousel
+  images={[
+    { src: wetrava, caption: "Trava's first iteration - hotel search and booking", class: "!object-contain bg-black" },
+    {
+      src: welltrava,
+      caption: "Trava's second iteration - AI powered travel planning",
+      class: "!object-contain bg-black",
+    },
+  ]}
+/>
 
 ### Headwinds
 
@@ -307,4 +319,4 @@ I would have loved to have more success, the lessons learned were invaluable. So
 1. **Innovation Over Novelty**: Instead of trying to create an entirely new category, it's more effective to introduce innovations within existing ones. This approach generally resonates better with potential customers.
 1. **Understand the 'Why Now?':** If you're puzzled about why your brilliant idea hasn't been executed before, the answer is **not** because it hasn't been thought of. Chances are, it's been tried and didn't take off. If you don't have a specific reason why it will work this time, it will very likely fail again.
 1. **Recognize Your Business Strength:** The [seven business powers](https://www.sachinrekhi.com/7-powers-hamilton-helmer) is a framework we talked about all the time, it's
-a useful framework for analyzing your model's defensibility against incumbments.
+   a useful framework for analyzing your model's defensibility against incumbments.
