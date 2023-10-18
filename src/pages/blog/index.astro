@@ -12,14 +12,14 @@ const posts = (await getCollection("blog"))
 
 <MainLayout title="The Blog" showNav={true}>
   <div class="padded-container flex flex-col gap-12">
-    <h1 class="page-title">The Blog</h1>
+    <h1 class="page-title text-indigo-800">The Blog</h1>
     <ul class="flex flex-col gap-10">
       {
         posts.map((post) => (
           <li class="flex flex-col gap-px">
             <a href={`/blog/${post.slug}/`}>
               <p class="text-lg font-semibold">{post.data.title}</p>
-              <p class="line-clamp-2 text-sm font-light">{post.data.description}</p>
+              <p class="line-clamp-2 font-light">{post.data.description}</p>
               <div class="flex items-center gap-3">
                 <FormattedDate class="text-sm text-slate-600" date={post.data.pubDate} />
                 <If cond={post.data.draft}>

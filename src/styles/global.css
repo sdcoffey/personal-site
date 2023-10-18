@@ -2,13 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
+@layer components {
+  @font-face {
+    font-family: 'Peachi';
+    src: url('/fonts/peachi-medium.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
   h1 {
-    @apply text-3xl;
+    @apply text-3xl font-peachi;
   }
 
   h1.page-title {
-    @apply text-5xl font-bold lg:text-8xl;
+    @apply text-5xl font-bold lg:text-8xl font-peachi;
+  }
+
+  h2 {
+    @apply font-peachi;
   }
 
   .min-h-available {

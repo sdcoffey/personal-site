@@ -1,8 +1,22 @@
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        "peachi": ["Peachi", ...defaultTheme.fontFamily.serif],
+      },
+      typography: ({theme}) => ({
+        indigo: {
+          css: {
+            '--tw-prose-headings': theme('colors.indigo[800]'),
+            '--tw-prose-body': theme('colors.indigo[900]'),
+          }
+        }
+      })
+    },
   },
   plugins: [
     require("@tailwindcss/typography"),

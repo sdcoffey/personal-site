@@ -21,7 +21,9 @@ if (heroImage) {
 ---
 
 <MainLayout title={title} docTitle={title} docDescription={description} showNav={true} image={metaImg?.src}>
-  <article class="padded-container article prose mx-auto prose-pre:rounded-sm prose-pre:bg-slate-200 prose-pre:p-1">
+  <article
+    class="padded-container article prose prose-indigo mx-auto prose-pre:rounded-sm prose-pre:bg-slate-200 prose-pre:p-1"
+  >
     <h1 class="page-title mb-2">{title}</h1>
     {description && <h4>{description}</h4>}
 

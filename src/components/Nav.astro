@@ -21,21 +21,21 @@ const externalLinks = [
 ---
 
 <nav
-  class="navigation fixed left-0 right-0 top-0 z-10 flex w-full justify-between gap-8 bg-slate-50 p-4 lg:w-fit lg:flex-col lg:justify-start lg:p-8"
+  class="navigation fixed left-0 right-0 top-0 z-10 flex w-full justify-between gap-8 bg-white p-4 lg:w-fit lg:flex-col lg:justify-start lg:p-8"
 >
   <button class="navigation__mobile-nav-toggle hidden">
     <Bars3 class="h-6 w-6 text-slate-600 hover:text-black" />
   </button>
 
   <div class="flex items-center gap-1 lg:flex-col lg:items-start">
-    <h2 class="hidden text-sm font-bold text-slate-600 lg:block">Stuff here</h2>
+    <h2 class="hidden font-sans text-sm font-bold text-slate-600 lg:block">Stuff here</h2>
     <HeaderLink href="/">Home</HeaderLink>
     <HeaderLink href="/blog">Blog</HeaderLink>
     <HeaderLink href="/resume">Resume</HeaderLink>
   </div>
 
   <div class="hidden gap-1 lg:flex lg:flex-col">
-    <h2 class="text-sm font-bold text-slate-600">Stuff elsewhere</h2>
+    <h2 class="font-sans text-sm font-bold text-slate-600">Stuff elsewhere</h2>
     {
       externalLinks.map((link) => (
         <HeaderLink href={link.url} external={true}>
