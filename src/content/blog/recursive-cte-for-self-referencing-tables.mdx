@@ -1,7 +1,54 @@
 ---
 title: "Recursive CTEs for Fun and Profit"
-description: Self-referencing tables dont have to suck!
-pubDate: "2023-08-10"
-heroImage: ../../assets/placeholder-hero.jpg
-draft: true
+description: Strategies for dealing with self-referencing data structures in Postgres
+pubDate: "2023-10-18"
+heroImage: ../../assets/recursive-sql.png
+heroImageCaption: /imagine a fractal pattern representing the concept of a recursive database query
 ---
+
+import { CodeBlock } from "../../components/index.js";
+
+Have you ever dealt with a data structure that looked like this?
+
+<CodeBlock tabs={["recursive-ctes/employee.ts"]} />
+
+This data structure is _self-referencing_. That is, it may reference others of its own
+type, if, for example, we need to reference an Employee's manager or find one of their direct
+reports.
+
+I use Typescript above for simplicity of type definitions, but because data storage
+mostly happens in the database in production environments (I hope), let's translate this
+into the definition of a table. We'll use Postgres-flavored SQL for this exercise, these same concepts
+will translate into roughly equivalent MySQL or SQLite.
+
+<CodeBlock tabs={["recursive-ctes/create-employees.sql"]} />
+
+Great! So what do you do if you need to find the name and title of someone's skip-level manager (i.e. your manager's manager)?
+Wrong answers first!
+
+<CodeBlock tabs={["recursive-ctes/find-skip-level.ts"]} />
+
+Why is this a wrong answer? Well, besides the pseudo-database code, it is also a perfect
+example of an **N+1** query. That is, a querying pattern where you make one initial query,
+and one additional query for every item of some iterator that you need to gather data on.
+
+N+1 queries are bad becuase, in general, it takes more time to go back and forth from the database,
+with the wire time, serialization and deserialization, than the database spends actually performing your
+query. It would be _much better_ to do this as one query.
+
+## Recursive CTEs
+
+Recursive CTEs (**C**ommon **T**able **E**xpressions) are a simple way to traverse self-referencing data
+with ease.
+
+<details>
+  <summary>Wait, what's a CTE?</summary>
+  Common Table Expressions help you write cleaner, more expressive queries by allowing you to construct one or
+  more psuedo-tables in the scope of the query, that you can select from later. Here's an example:
+
+  <CodeBlock tabs={["recursive-ctes/cte-example.sql", "recursive-ctes/cte-example-ddl.sql"]} />
+</details>
+
+So what would the SQL look like to replace our code above?
+
+<CodeBlock tabs={["recursive-ctes/find-skip-level.sql"]} />

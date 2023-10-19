@@ -13,6 +13,7 @@ module.exports = {
           css: {
             '--tw-prose-headings': theme('colors.indigo[800]'),
             '--tw-prose-body': theme('colors.indigo[900]'),
+            '--tw-prose-bold': theme('colors.indigo[900]'),
           }
         }
       })
