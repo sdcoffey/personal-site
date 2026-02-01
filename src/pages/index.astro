@@ -89,21 +89,24 @@ const foss: Foss[] = [
             <li>
               <a href={url} target="_blank" rel="noreferrer" class="no-underline">
                 <div class="flex items-center gap-4">
-                  <div class="flex grow flex-col">
+                  <div class="open-source__content flex grow flex-col">
                     <div class="flex items-center gap-2">
                       <h2 class="font-sans">{name}</h2>
                       <p
                         class:list={[
-                          "rounded px-1 !text-xs",
-                          { "bg-emerald-400": type === "Author", "bg-amber-400": type === "Contributor" },
+                          "open-source__badge rounded px-1 !text-xs",
+                          {
+                            "bg-emerald-400 text-emerald-900": type === "Author",
+                            "bg-amber-400 text-amber-900": type === "Contributor",
+                          },
                         ]}
                       >
                         {type}
                       </p>
                     </div>
-                    <p>{description}</p>
+                    <p class="open-source__description">{description}</p>
                   </div>
-                  <span class="flex-shrink px-3 font-mono uppercase text-slate-400">{language}</span>
+                  <span class="flex-shrink px-3 font-mono text-slate-400 uppercase">{language}</span>
                 </div>
               </a>
             </li>
@@ -115,6 +118,8 @@ const foss: Foss[] = [
 </MainLayout>
 
 <style>
+  @reference "../styles/global.css";
+
   .open-source {
     ul {
       @apply divide-y-4 divide-slate-50;
@@ -128,7 +133,11 @@ const foss: Foss[] = [
         @apply text-lg font-semibold text-slate-800;
       }
 
-      p {
+      .open-source__content {
+        @apply gap-1;
+      }
+
+      .open-source__description {
         @apply text-sm text-slate-600;
       }
 

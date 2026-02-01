@@ -1,6 +1,6 @@
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
-import tailwind from "@astrojs/tailwind";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "astro/config";
 
 // https://astro.build/config
@@ -11,6 +11,18 @@ export default defineConfig({
       drafts: true,
     }),
     sitemap(),
-    tailwind(),
   ],
+  vite: {
+    plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules/three")) return "three";
+            if (id.includes("node_modules/cannon")) return "cannon";
+          },
+        },
+      },
+    },
+  },
 });

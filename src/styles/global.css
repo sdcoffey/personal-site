@@ -1,6 +1,5 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.cjs";
 
 @layer components {
   @font-face {
@@ -33,13 +32,18 @@
 
   .article {
     .astro-code {
-      @apply m-0 rounded-none bg-transparent p-0 !important;
+      @apply !m-0 !rounded-none !bg-transparent !p-0;
     }
   }
 
   .article-content {
     .astro-code {
       @apply !my-6 !rounded-lg !bg-slate-800 !p-4;
+      @apply !text-xs lg:!text-sm;
+    }
+
+    .astro-code.code-tabs-pre {
+      @apply !m-0 !rounded-none !bg-slate-800 !p-4;
       @apply !text-xs lg:!text-sm;
     }
 
@@ -119,6 +123,95 @@
         @apply max-h-[60vh] overflow-y-scroll lg:max-h-[700px];
       }
     }
+  }
+
+  .code-tabs-container {
+    @apply my-8 flex flex-col;
+  }
+
+  .code-tabs-container__copy-button {
+    @apply absolute top-3 right-3 rounded border border-slate-600 bg-slate-800/20 px-2 py-2 text-xs font-medium text-white backdrop-blur-sm;
+    @apply transition hover:border-slate-500 hover:bg-slate-700/20 hover:underline;
+    @apply shadow-inner active:bg-slate-800;
+  }
+
+  .code-tabs-container__copy-button svg {
+    @apply h-5 w-5 text-slate-50;
+  }
+
+  .code-tabs-container__copy-button svg:nth-child(2) {
+    @apply hidden;
+  }
+
+  .code-tabs-container__copy-button--selected {
+    @apply border-emerald-500 bg-emerald-500/20 hover:border-emerald-500 hover:bg-emerald-500/20;
+  }
+
+  .code-tabs-container__copy-button--selected svg {
+    @apply text-emerald-500;
+  }
+
+  .code-tabs-container__copy-button--selected svg:first-child {
+    @apply hidden;
+  }
+
+  .code-tabs-container__copy-button--selected svg:nth-child(2) {
+    @apply block;
+  }
+
+  .code-tabs-container__code-container {
+    @apply relative;
+  }
+
+  .code-tabs-container__code-container--hidden {
+    @apply hidden;
+  }
+
+  .code-tabs-container__output {
+    @apply flex items-center gap-2 bg-slate-800 px-3;
+  }
+
+  .code-tabs-container__output-rule {
+    @apply my-0 border-slate-700;
+  }
+
+  .code-tabs-container__output-rule--short {
+    @apply w-8 flex-shrink-0;
+  }
+
+  .code-tabs-container__output-rule--long {
+    @apply w-12 grow;
+  }
+
+  .code-tabs-container__output-label {
+    @apply font-mono text-xs leading-none text-slate-600;
+  }
+
+  .code-tabs-container__output-code > pre.code-tabs-pre {
+    padding-top: calc(var(--spacing) * 3) !important;
+  }
+
+  .code-tabs-container__tab {
+    @apply p-1 p-3 font-mono text-xs whitespace-nowrap text-slate-400;
+    @apply hover:cursor-pointer;
+  }
+
+  .code-tabs-container__tab--selected {
+    @apply bg-slate-600/50 text-slate-50 shadow;
+  }
+
+  .code-tabs-container .code-rounded-b-lg pre.astro-code {
+    border-bottom-left-radius: var(--radius-lg) !important;
+    border-bottom-right-radius: var(--radius-lg) !important;
+  }
+
+  .code-tabs-container .code-rounded-b-lg > pre.code-tabs-pre {
+    border-bottom-left-radius: var(--radius-lg) !important;
+    border-bottom-right-radius: var(--radius-lg) !important;
+  }
+
+  .article-content .code-tabs-container .code-rounded-b-lg .astro-code {
+    @apply !rounded-b-lg;
   }
 
   .padded-container {

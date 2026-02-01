@@ -1,4 +1,4 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultTheme = require("tailwindcss/defaultTheme");
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -6,17 +6,17 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        "peachi": ["Peachi", ...defaultTheme.fontFamily.serif],
+        peachi: ["Peachi", ...defaultTheme.fontFamily.serif],
       },
-      typography: ({theme}) => ({
+      typography: ({ theme }) => ({
         indigo: {
           css: {
-            '--tw-prose-headings': theme('colors.indigo[800]'),
-            '--tw-prose-body': theme('colors.indigo[900]'),
-            '--tw-prose-bold': theme('colors.indigo[900]'),
-          }
-        }
-      })
+            "--tw-prose-headings": theme("colors.indigo[800]"),
+            "--tw-prose-body": theme("colors.indigo[900]"),
+            "--tw-prose-bold": theme("colors.indigo[900]"),
+          },
+        },
+      }),
     },
   },
   plugins: [
@@ -40,7 +40,7 @@ module.exports = {
         ".scrollbar-hidden::-webkit-scrollbar": {
           display: "none",
         },
-        "scrollbar-hidden": {
+        ".scrollbar-hidden": {
           "-ms-overflow-style": "none",
           "scrollbar-width": "none",
         },

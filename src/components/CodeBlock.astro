@@ -2,9 +2,8 @@
 import fs from "fs";
 import path from "path";
 import fm from "front-matter";
-import { Code } from "astro/components";
-
-import { joinToProjectRoot } from "../utilities";
+import { joinToProjectRoot } from "../utilities/server";
+import { getShikiHighlighter } from "../utilities/shiki";
 import { Square2Stack, Checkmark } from "../assets/icons";
 
 type Tab = {
@@ -20,13 +19,21 @@ type Props = {
   tabs: Array<Tab | string>;
 };
 
-function readTab(tab: Tab | string): {
+type TabData = {
   class: string;
   filename: string;
   code: string;
   language: string;
   copyable: boolean;
-} {
+  bash?: string;
+};
+
+type RenderedTab = TabData & {
+  codeHtml: string;
+  bashHtml?: string;
+};
+
+function readTab(tab: Tab | string): TabData {
   if (typeof tab === "string") {
     const filepath = joinToProjectRoot("snippets", tab);
     const src = fs.readFileSync(filepath, "utf-8");
@@ -62,116 +69,75 @@ function readTab(tab: Tab | string): {
 }
 
 const { tabs } = Astro.props;
+
+const highlighter = await getShikiHighlighter();
+const renderedTabs: RenderedTab[] = await Promise.all(
+  tabs.map(async (tab) => {
+    const data = readTab(tab);
+    const codeHtml = await highlighter.codeToHtml(data.code.trim(), data.language, {
+      attributes: { class: "code-tabs-pre" },
+    });
+    const bashHtml = data.bash
+      ? await highlighter.codeToHtml(`$ ${data.bash.trim()}`, "bash", {
+          attributes: { class: "code-tabs-pre code-tabs-pre--bash" },
+        })
+      : undefined;
+
+    return {
+      ...data,
+      codeHtml,
+      bashHtml,
+    };
+  }),
+);
 ---
 
-<div class="code-tabs-container">
+<div class="code-tabs-container not-prose">
   <div
-    class="scrollbar-hidden flex max-w-full flex-row divide-x divide-slate-700 overflow-x-scroll rounded-t-lg border-b border-slate-700 bg-slate-800"
+    class="scrollbar-hidden flex max-w-full flex-row divide-x divide-slate-800 overflow-x-scroll rounded-t-lg border-b border-slate-800 bg-slate-900"
   >
     {
-      tabs.map((tab) => (
+      renderedTabs.map((tab) => (
         <div
-          data-filename={readTab(tab).filename}
-          class:list={["code-tabs-container__tab", { "no-underline": tabs.length === 1 }]}
+          data-filename={tab.filename}
+          class:list={["code-tabs-container__tab", { "no-underline": renderedTabs.length === 1 }]}
         >
-          {readTab(tab).filename}
+          {tab.filename}
         </div>
       ))
     }
   </div>
-  <div>
+  <>
     {
-      tabs.map((tab) => {
-        const { class: cls, copyable, bash, filename, code, language } = readTab(tab);
+      renderedTabs.map((tab) => {
+        const { class: cls, copyable, bashHtml, filename, codeHtml, code } = tab;
         return (
           <div class="code-tabs-container__code-container" data-filename={filename}>
-            {bash && (
+            {bashHtml && (
               <div>
-                <Code lang="bash" code={`$ ${bash.trim()}`} class="border border-b" />
-                <div class="!my-0 flex flex-row items-center gap-2 bg-slate-800 !py-0">
-                  <hr class="my-0 w-8 flex-shrink-0 border-slate-700" />
-                  <p class="my-0 font-mono text-xs text-slate-600">Output</p>
-                  <hr class="my-0 w-12 grow border-slate-700" />
+                <Fragment set:html={bashHtml} />
+                <div class="code-tabs-container__output">
+                  <hr class="code-tabs-container__output-rule code-tabs-container__output-rule--short" />
+                  <span class="code-tabs-container__output-label">Output</span>
+                  <hr class="code-tabs-container__output-rule code-tabs-container__output-rule--long" />
                 </div>
               </div>
             )}
-            <div class:list={[cls, { "code-rounded-b-lg": true }]}>
-              {!bash && copyable && (
+            <div class:list={[cls, { "code-rounded-b-lg": true, "code-tabs-container__output-code": !!bashHtml }]}>
+              {!bashHtml && copyable && (
                 <button data-code-copy-button data-code-copy-content={code} class="code-tabs-container__copy-button">
                   <Square2Stack class="code-tabs-container__copy-button__clipboard" />
                   <Checkmark class="code-tabs-container__copy-button__checkmark" />
                 </button>
               )}
-              <Code lang={language} code={code.trim()} />
+              <Fragment set:html={codeHtml} />
             </div>
           </div>
         );
       })
     }
-  </div>
+  </>
 </div>
-
-<style is:global>
-  .code-tabs-container {
-    @apply my-8 flex flex-col;
-
-    &__copy-button {
-      @apply absolute right-3 top-3 rounded border border-slate-600 bg-slate-800/20 px-2 py-2 text-xs font-medium text-white backdrop-blur-sm;
-      @apply transition hover:border-slate-500 hover:bg-slate-700/20 hover:underline;
-      @apply shadow-inner active:bg-slate-800;
-
-      svg {
-        @apply h-5 w-5 text-slate-50;
-
-        &:nth-child(2) {
-          @apply hidden;
-        }
-      }
-
-      &--selected {
-        @apply border-emerald-500 bg-emerald-500/20 hover:border-emerald-500 hover:bg-emerald-500/20;
-
-        svg {
-          @apply text-emerald-500;
-
-          &:first-child {
-            @apply hidden;
-          }
-          &:nth-child(2) {
-            @apply block;
-          }
-        }
-      }
-    }
-
-    &__code-container {
-      @apply relative;
-
-      &--hidden {
-        @apply hidden;
-      }
-
-      .code-rounded-b-lg {
-        pre.astro-code {
-          @apply !rounded-b-lg;
-        }
-      }
-
-      pre.astro-code {
-        @apply !my-0 !rounded-b-none !rounded-t-none;
-      }
-    }
-
-    &__tab {
-      @apply whitespace-nowrap p-1 p-3 font-mono text-xs text-slate-400;
-      @apply hover:cursor-pointer;
-
-      &--selected {
-        @apply bg-slate-600/50 text-slate-50 shadow;
-      }
-    }
-  }
-</style>
 
 <script>
   document.querySelectorAll(".code-tabs-container").forEach((container) => {
