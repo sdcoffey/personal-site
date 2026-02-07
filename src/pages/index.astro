@@ -13,6 +13,14 @@ const posts = (await getCollection("blog"))
 type Foss = { name: string; type: "Author" | "Contributor"; description: string; language: string; url: string };
 const foss: Foss[] = [
   {
+    name: "Open Responses",
+    type: "Author",
+    description:
+      "Open Responses is an open source specification for building LLM APIs based on OpenAI's Responses API.",
+    url: "https://openresponses.org",
+    language: "N/A",
+  },
+  {
     name: "Techan",
     type: "Author",
     description:
